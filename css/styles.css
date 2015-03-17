@@ -1,0 +1,179 @@
+ /* Custom, iPhone Retina, for smalllest mobile phones */ 
+		    @media only screen and (min-width : 320px) {
+
+		    	.head {
+		    		height: 280px;
+		    	}
+
+		    	.profileNav>ul>li {
+					margin-left: 0%;	
+					font-size: 6px;				
+				} 
+
+				.displayImg {
+					margin-left: 30%;
+					width: 120px;
+					height: 120px;
+					margin-top: 13%;
+					/*margin-top: 150px;     */
+				}    
+
+				.basic {
+					margin: 5% 0% 1% 4%;  
+				}
+
+				.education {
+					margin: 3% 0% 1% 3%;	
+				}
+
+				.experience {
+					margin: 3% 0% 1% 3%;		
+				}
+
+				.interest {
+					margin: 3% 0% 1% 3%;		
+				}
+		    }    
+
+		    /* Extra Small Devices, Phones */ 
+		    @media only screen and (min-width : 480px) {
+
+		    	.head {
+		    		height: 300px;
+		    	}
+
+		    	.profileNav>ul>li {
+					margin-left: 12%;					
+					font-size: 8px;
+				} 
+
+				.displayImg {
+					margin-left: 40%;
+					width: 120px;
+					height: 120px;	
+					margin-top: 10%;
+				}
+
+				.basic {
+					margin: 4% 0% 1% 5%;
+				}
+
+				.education {
+					margin: 2% 0% 1% 3%;	
+				}
+
+				.experience {
+					margin: 2% 0% 1% 3%;		
+				}
+
+				.interest {
+					margin: 2% 0% 1% 3%;		
+				}
+		    }
+
+		    /* Small Devices, Tablets */
+		    @media only screen and (min-width : 768px) {
+
+		    	.head {
+					height: 350px;
+				}
+
+		    	.profileNav>ul>li {
+					margin-left: 12%;	
+					font-size: 12px;				
+				}
+
+				.displayImg {
+					width: 150px;
+					height: 150px;
+					margin-left: 80%;
+					margin-top: 10%;
+				}
+
+				.basic {
+					margin: 4% 0% 1% 3%;
+				}
+
+				.education {
+					margin: 2% 0% 1% 3%;	
+				}
+
+				.experience {
+					margin: 2% 0% 1% 3%;		
+				}
+
+				.interest {
+					margin: 2% 0% 1% 3%;		
+				}
+		    }
+
+		    /* Medium Devices, Desktops */
+		    @media only screen and (min-width : 992px) {
+
+		    	.head {
+		    		height: 400px;
+		    	}
+
+		    	.profileNav>ul>li {
+					margin-left: 18%;	
+					font-size: 15px;					
+				} 
+
+				.displayImg {
+					margin-left: 80%;
+					margin-top: 12%;
+				}
+
+				.basic {
+					margin: 4% 0% 1% 2%;
+				}
+
+				.education {
+					margin: 2% 0% 1% 3%;	
+				}
+
+				.experience {
+					margin: 2% 0% 1% 3%;		
+				}
+
+				.interest {
+					margin: 2% 0% 1% 3%;		
+				}
+		    }
+
+		    /* Large Devices, Wide Screens */
+		    @media only screen and (min-width : 1200px) {
+
+		    	.head {
+		    		height: 600px;
+		    	}
+
+
+		    	.profileNav>ul>li {
+					margin-left: 23%;					
+					font-size: 18px;					
+				} 
+
+				.displayImg {
+					margin-left: 85%;
+					margin-top: 22%;
+					width: 225px;
+					height: 225px;
+				}
+
+				.basic {
+					margin: 4% 0% 1% 3%;
+				}
+
+				.education {
+					margin: 2% 0% 1% 3%;	
+				}
+
+				.experience {
+					margin: 2% 0% 1% 3%;		
+				}
+
+				.interest {
+					margin: 2% 0% 1% 3%;		
+				}
+		    }
