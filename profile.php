@@ -1,8 +1,7 @@
 <?php 
-
 	//these are for the PHP Helper files
 	//include('headers/databaseConn.php');
-	include('headers/helpers.php');
+	include('helpers.php');
 
 	//to get the query String values in the respective variables.
 	if(isset($_SERVER["QUERY_STRING"])) {
@@ -11,50 +10,6 @@
 	else {
 		header("location: profile.php?exist=1");
 	}
-
-	 
-			//this is the PHP code to execute the correct Linkedin Authentication function depending on the parameters passed!
-			/*if(isset($exist)) {
-				if($exist == 1) {
-					//this is the place where all data needs to come from the database after linkedin Authentication!!			
-					echo "<script type='text/javascript'> onLinkedInLoad(1); </script>";
-				}
-				else if($exist == 2) {
-					//this is the place where all data needs to come LinkedIn itself after linkedin Authentication!!
-					echo "<script type='text/javascript'> onLinkedInLoad(2); </script>";
-				}
-				else if($exist == 3) {
-					//this is the place where all data needs to come LinkedIn itself after linkedin Authentication!!
-					echo "<script type='text/javascript'> onLinkedInLoad(3); </script>";
-				}
-				else {
-					echo "<script type='text/javascript'> onLinkedInLoad(4); </script>";
-				}	
-			}
-			else {
-				echo "<script type='text/javascript'> onLinkedInLoad(4); </script>";
-			}  */
-
-	/*//to get the exist Query_String value
-	if(isset($exist)) {
-		if($exist == 1) {
-			//this is the place where all data needs to come from the database after linkedin Authentication!!
-
-		}
-		else if($exist == 2) {
-			//this is the place where all data needs to come LinkedIn itself after linkedin Authentication!!
-		}
-		else if($exist == 3) {
-			//this is the place where all data needs to come LinkedIn itself after linkedin Authentication!!
-		}
-		else {
-			die("Bad Query String values!!!");
-		}	
-	}
-	else {
-		die("The Query String does not Exists!!");
-	}   */
-
 ?>
 
 <!DOCTYPE html>
@@ -78,6 +33,9 @@
 
 		<!-- for the Scrolly jQuery plugin -->
 		<script src="js/jquery.scrolly.min.js"></script>
+
+		<!-- for all the custom javascript functions -->
+		<script src="js/scripts.js"></script>
 
 		<!-- for all the styles with the media queries -->
 		<link href="css/styles.css" rel="stylesheet" media="screen" />
@@ -274,29 +232,46 @@
 
 		 <script type="text/javascript">
 
+		 	var qs = getQueryStrings();
+
 	        function onLinkedInLoad() {
 
-	        	<?php 
-		        	if(isset($exist)) {
-		        		if($exist == 1) {
-		        			echo "IN.User.authorize(onlyAuthenticate);";
-		        		}
-		        		else if($exist == 2 || $exist == 3) {
-		        			echo "IN.User.authorize(linkedInAuth);";	
-		        		}
-		        		else {
-		        			echo "window.location.href = 'error.php?err=The URL could not resolved. Please try again.';";
-		        		}
-	        		} 
-	        	?>
-
+	        	IN.User.authorize(onlyAuthenticate);
+	        	
+        		/*if(qs["exist"] == "1") {
+        			IN.User.authorize(onlyAuthenticate);
+        		}
+        		else if(qs["exist"] == "2") {
+        			//IN.User.authorize(onlyAuthenticate);
+        			alert("Exist = 2");	
+        		}
+        		else if(qs["exist"] == "3") {
+        			//IN.User.authorize(onlyAuthenticate3);
+        			alert("Exist = 3");	
+        		}
+        		else {
+        			alert("We have an error here.");
+        		}  */
 	        }   //end of the onLinkedInLoad function!!
 
 	        //this is the function for only authentication.
 	        function onlyAuthenticate() {
 	        	//here, all the data needs to be loaded from the database!
 	        	console.log("I m in the onlyAuthenticate function. Data to be loaded from Database!");
-
+	        	//now, get data from the database here and show it appropriately!!
+	        	$.ajax({
+	        		type: "GET",
+	        		url: "AJAXFunctions.php/LoadData",
+	        		data: {
+	        			no: "2", email: getCookie("userEmail"), id: getCookie("userID")
+	        		},
+	        		success: function(response) {
+	        			alert("Success in getting the data from the database" + response);
+	        		},
+	        		error: function() {
+	        			alert("Error in getting the data from the database");
+	        		}
+	        	});
 	        }
 
 	        //this is the authenticate function here!!
@@ -309,17 +284,37 @@
 
 	                    var memData = data.values[0];
 
+	                    //var jsonBasic = JSON.stringify(memData);
+	                    var jsonPhone = JSON.stringify(memData.phoneNumbers.values[0]);
+	                    var jsonPic = JSON.stringify(memData.pictureUrls.values[0]);
 	                    var jsonEdu = JSON.stringify(memData.educations.values);
+	                    var jsonExp = JSON.stringify(memData.positions.values);
 
 	                    //all the data from the user's linkedin profile goes here into the AJAx call and then saved in to the database.
 	                    $.ajax({
 	                    	type: "GET",
 	                    	url: "AJAXFunctions.php",
 	                    	data: {
-	                    		no: "1", basic: memData, education: jsonEdu
+	                    		no: "1", basic: memData, contact: jsonPhone, picture: jsonPic, education: jsonEdu, experience: jsonExp
 	                    	},
 	                    	success: function(response) {
-	                    		alert("success in ajax. " + response);
+
+	                    		//here, save the cookies in javaScript!
+	                    		var resArr = response.split(", ");
+	                    		response = resArr[0];
+
+	                    		var userEmail = resArr[1];
+	                    		var userID = resArr[2];
+
+	                    		setCookie("userEmail", userEmail, 150);
+	                    		setCookie("userID", userID, 150);
+
+	                    		if(response == "1") {
+	                    			alert("Data Saved Successfully.");
+	                    		}
+	                    		else {
+	                    			alert("Error in saving the data. Please recheck." + response);	
+	                    		}
 	                    	},
 	                    	error: function(response) {
 	                    		alert("This is the error in AJAX. " + response);
@@ -955,4 +950,4 @@
 	
 	</body>
 
-</html>
+</html> 

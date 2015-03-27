@@ -1,7 +1,7 @@
 <?php 
 
 	//to make the database connection here!
-	$connection=mysql_connect("localhost","root","9666836106");
+	$connection=mysql_connect("localhost","root","");
 	if(!$connection) {
 	    die("Error Establishing connection");
 	}

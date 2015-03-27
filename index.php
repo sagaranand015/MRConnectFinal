@@ -3,9 +3,9 @@
 	//these are for the PHP Helper files
 	//include('headers/databaseConn.php');
 	//include('headers/AJAXFunctions.php');
-	include('headers/helpers.php');
+	include('helpers.php');
 
-	if(isset($_COOKIE["user"]) && isset($_COOKIE["userId"])) {    //this is when the cookies exist aleady!
+	/*if(isset($_COOKIE["user"]) && isset($_COOKIE["userId"])) {    //this is when the cookies exist aleady!
 
 		//Also, consider the fact that cookies might not exist. But the user is already there in the database. Clear that too!!
 		//leave this thing as of now!!
@@ -20,7 +20,7 @@
 	else {
 		//die("There are no Cookies!!");
 		//header("location: profile.php?exist=-1&int=1");		
-	}  
+	}   */ 
 
 ?>
 
@@ -44,6 +44,9 @@
 
 		<!-- for the Scrolly jQuery plugin -->
 		<script src="js/jquery.scrolly.min.js"></script>
+
+		<!-- for all the custom javascript functions -->
+		<script src="js/scripts.js"></script>
 
 		<!-- for all the styles with the media queries -->
 		<link href="css/styles.css" rel="stylesheet" media="screen" />	
@@ -78,7 +81,27 @@
     			var btnLogin = $('#btnLogin');
 
     			btnLogin.on('click', function() {
-    				window.location.href =  "profile.php?exist=1";
+
+					//alert(getCookie("userEmail") + " --> " + getCookie("userID"));
+
+    				//here, check if the cookies exist. If they exist, then go to exist=1 or else exist=2
+    				if(getCookie("userEmail") != "" && getCookie("userID") != "") {
+    					//when both the cookies exists. Load data from database here, obviously after checking if data exists!
+    					window.location.href =  "profile.php?exist=1";	
+    				}
+    				else if(getCookie("userEmail") != "" && getCookie("userID") == "") {
+    					//when either of the cookies do not exist. Load data from the database if exists, otherwise from Linkedin.
+    					window.location.href =  "profile.php?exist=2";		
+    				}
+    				else if(getCookie("userEmail") == "" && getCookie("userID") != "") {
+    					//when either of the cookies do not exist. Load data from the database if exists, otherwise from Linkedin.
+    					window.location.href =  "profile.php?exist=2";		
+    				}
+    				else if(getCookie("userEmail") == "" && getCookie("userID") == "") {
+    					//No cookies exist. Load data from database if record exists. Otherwise from linkedin.
+    					window.location.href =  "profile.php?exist=3";		
+    				}
+
     				return false;
     			});
 
