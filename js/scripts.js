@@ -48,3 +48,26 @@ function getQueryStrings() {
     }
 return assoc;
 }
+
+//this is the function to change the active state of the list on the LHS
+function changeActiveState(item) {
+    $('a.active').removeClass('active');
+    $(item).addClass('active');
+}
+
+//for the animate effect of the div on the RHS on click of the list on LHS
+function showDiv(item) {
+    var arr = $('.divsMain');
+    var ob = $(item);
+
+    for (var i = 0; i < arr.length; i++) {
+        $(arr[i]).hide(1);
+        $(arr[i]).css({
+          top: '1000px'
+        });
+    }
+    ob.show(1);
+    ob.animate({
+      top: '0px'
+    }, 300);
+}
