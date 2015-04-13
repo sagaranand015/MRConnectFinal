@@ -99,7 +99,7 @@
 	}
 
 	//this is the function to search by Expertise.
-	function SearchByExpertise($i1, $i2, $i5, $i6) {
+	function SearchByExpertise($i1, $i2, $i5, $i6, $i7) {
 		global $connection;
 		$response = "<div class='list-group-item'>";
 		try {
@@ -112,8 +112,10 @@
 				$i5 = "~~";
 			if($i6 == "")	
 				$i6 = "~~";
+			if($i7 == "")	
+				$i7 = "~~";
 
-			$query = "select * from Interests where Interest1 like '%$i1%' or Interest2 like '%$i2%' or Interest5 like '%$i5%' or Interest6 like '%$i6%'";
+			$query = "select * from Interests where Interest1 like '%$i1%' or Interest2 like '%$i2%' or Interest5 like '%$i5%' or Interest6 like '%$i6%' or Interest3 like '%$i7%' or Interest4 like '%$i7%' or Interest7 like '%$i6%'";
 			$rs = mysql_query($query);
 			if(!$rs) {
 				$response = "-1";
@@ -141,7 +143,7 @@
 		$email = "";
 		$interests = "";
 		try {
-			$query = "select * from Users where UserName like '%$searchKey%'";
+			$query = "select * from Users where UserName like '%$searchKey%' or UserEmail like '%searchKey%'";
 			$rs = mysql_query($query);
 			if(!$rs) {
 				$response = "-1";
@@ -163,7 +165,8 @@
 						}
 					}  
 					$interests = substr($interests, 0, strlen($interests) - 2);
-					$response .= "<div class='list-group-item item'><img src='" . $res["UserPic"] . "' class='userImage' width='170' height='170' /><div class='userItem'><p class='userName'>" . $res["UserName"] . "</p><p class='userLocation'> <span>Currently at: </span> <u>" . $res["UserLocation"] . "</u> <br /> <span>Expertise in: </span> <u>" . $interests . "</u> </p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div><button class='btn btn-lg btn-primary btn-block btnConnRequest' data-id='" . $id . "' data-email='" . $email . "'>Send a Connection Request</button></div>";
+					// <span>Currently at: </span> <u>" . $res["UserLocation"] . "</u> <br />
+					$response .= "<div class='list-group-item item'><img src='" . $res["UserPic"] . "' class='userImage' width='170' height='170' /><div class='userItem'><p class='userName'>" . $res["UserName"] . "</p><p class='userLocation'> <span>Expertise in: </span> <u>" . $interests . "</u> </p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div><button class='btn btn-lg btn-primary btn-block btnConnRequest' data-id='" . $id . "' data-email='" . $email . "'>Send a Connection Request</button></div>";
 				}
 			}
 			$response .= "</div>";
@@ -197,7 +200,7 @@
 					$in = explode(" @I ", $interests);
 					$interests = "";
 					foreach ($in as $i) {
-						if($i == "-" || $i == " " || $i == "") {
+						if($i == "-" || $i == " " || $i == "" || $i == "-3") {
 
 						}
 						else {
@@ -205,7 +208,15 @@
 						}
 					}  
 					$interests = substr($interests, 0, strlen($interests) - 2);
-					$response .= "<div class='list-group-item item'><img src='" . $res["UserPic"] . "' class='userImage' width='170' height='170' /><div class='userItem'><p class='userName'>" . $res["UserName"] . "</p><p class='userLocation'> <span>Currently at: </span> <u>" . $res["UserLocation"] . "</u> <br /> <span>Expertise in: </span> <u>" . $interests . "</u> </p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div><button class='btn btn-lg btn-primary btn-block btnConnRequest' data-id='" . $id . "' data-email='" . $email . "'>Send a Connection Request</button></div>";
+					if($interests == "") {
+						$interests = "None defined";
+					}
+
+					if($res["UserPic"] == "") {
+						$res["UserPic"] = "img/dp.jpg";
+					}
+					// <span>Currently at: </span> <u>" . $res["UserLocation"] . "</u> <br />
+					$response .= "<div class='list-group-item item'><img src='" . $res["UserPic"] . "' class='userImage' width='170' height='170' /><div class='userItem'><p class='userName'>" . $res["UserName"] . "</p><p class='userLocation'><span>Expertise in: </span> <u>" . $interests . "</u> </p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div><button class='btn btn-lg btn-primary btn-block btnConnRequest' data-id='" . $id . "' data-email='" . $email . "'>Send a Connection Request</button></div>";
 				}
 			}
 			$response .= "</div>";
@@ -271,11 +282,11 @@
 			}
 			else {
 				if(mysql_num_rows($rs) == 0) {
-					$response = "";
+					$response = "-3";
 				}
 				else {
 					while ($res = mysql_fetch_array($rs)) {
-						$response .= $res["Interest1"] . " @I " . $res["Interest2"] . " @I " . $res["Interest3"] . " @I " . $res["Interest4"] . " @I " . $res["Interest5"] . " @I " . $res["Interest6"] . " @I " . $res["Interest7"];
+						$response .= $res["Interest1"] . " @I " . $res["Interest2"] . " @I " . $res["Interest3"] . " @I " . $res["Interest4"] . " @I " . $res["Interest5"] . " @I " . $res["Interest6"] . " @I " . $res["Interest7"] . " @I ";
 					}					
 				}
 			}
@@ -345,7 +356,7 @@
 			}
 			else {
 				while ($res = mysql_fetch_array($rs)) {
-					$response .= $res["UserEmail"] . " ,& " . $res["UserName"] . " ,& " . $res["UserPic"] . " ,& " . $res["UserContact"] . " ,& " . $res["UserProfile"] . " ,& " . $res["UserLocation"] . " ,& " . $res["UserTwitter"] . " ,& " . $res["UserLastAss"] . " ,& " . $res["UserType"];
+					$response .= $res["UserEmail"] . " ,& " . $res["UserName"] . " ,& " . $res["UserPic"] . " ,& " . $res["UserContact"] . " ,& " . $res["UserProfile"] . " ,& " . $res["UserLocation"] . " ,& " . $res["UserTwitter"] . " ,& " . $res["UserLastAss"] . " ,& " . $res["UserType"] . " ,& " . $res["UserAssociation"] . " ,& ";
 				}
 			}
 			return $response;

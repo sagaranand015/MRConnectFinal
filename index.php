@@ -134,6 +134,10 @@
 				position: absolute;
 			}
 
+			.section-heading {
+				font-family: boldText;
+			}
+
     	</style>
 
 		<!-- onLoad: onLinkedInLoad -->
@@ -174,7 +178,7 @@
 							}
 						},
 						error: function(response) {
-							alert("ERROR in setting ID Cookie." + response.responseText);
+							//alert("ERROR in setting ID Cookie." + response.responseText);
 						}
 					});
 
@@ -287,8 +291,24 @@
 				var alertMsg = $('#alertMsg').fadeOut();
 				var popup = $('#popup').fadeOut();    			
 
+				$('#btnWorks').on('click', function() {
+					$('.worksModal').modal('show');
+					return false;
+				});
+
     		});
     	</script>
+
+    	<script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+			ga('create', 'UA-61843203-1', 'auto');
+			ga('send', 'pageview');
+		</script>
+
 	</head>	
 
 	<body id="page-top" class="index">
@@ -316,11 +336,18 @@
 	            <!-- Collect the nav links, forms, and other content for toggling -->
 	            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 	                <ul class="nav navbar-nav navbar-right">
-	                    <li class="hidden">
-	                        <a href="#page-top"></a>
+	                    <li>
+	                    	<a class="page-scroll" href="#" onclick="login()">Login</a>
 	                    </li>
 	                    <li>
-	                        <a class="page-scroll" href="#works">How it Works?</a>
+	                    	<a class="page-scroll" href="http://mentored-research.com">MR - Home</a>
+	                    </li>
+	                    <li>
+	                    	<!-- <a id="works" class="page-scroll" href="#">How it Works?</a>	 -->
+	                    	<!-- data-toggle="modal" data-target="#worksModal" -->
+	                    	<button id="btnWorks" class="btn btn-lg btn-primary" >
+	                    		How it Works
+	                    	</button>
 	                    </li>
 	                </ul>
 	            </div>
@@ -345,7 +372,7 @@
 	                        <i class="fa fa-shopping-cart fa-stack-1x fa-inverse"></i>
 	                    </span>
 	                    <h4 class="service-heading" style="font-family: boldText;">Comprehensive</h4>
-	                    <p class="text-muted">Get a comprehensive list of all the Mentored-Research alumni</p>
+	                    <p class="text-muted">Stay connected with fellow Mentored-Research alumni</p>
 	                </div>
 	                <div class="col-md-4">
 	                    <span class="fa-stack fa-4x">
@@ -353,7 +380,7 @@
 	                        <i class="fa fa-laptop fa-stack-1x fa-inverse"></i>
 	                    </span>
 	                    <h4 class="service-heading" style="font-family: boldText;">Request Based</h4>
-	                    <p class="text-muted">Request a talk by any of the Mentored-Research alumni, and gain insights into the tiniest technical details by professionals</p>
+	                    <p class="text-muted">Enrich your network and broaden your horizons</p>
 
 	                    <button id="btnLogin" class="btn btn-lg btn-primary" onclick="login()" style="margin:1% 1% 1% 1%;">
 							Get Started Now!
@@ -366,23 +393,115 @@
 	                        <i class="fa fa-lock fa-stack-1x fa-inverse"></i>
 	                    </span>
 	                    <h4 class="service-heading" style="font-family: boldText;">Mentorship</h4>
-	                    <p class="text-muted">Get mentored by professionals in the field of Equity & Finance, just at a click of a button</p>
+	                    <p class="text-muted">Seek guidance and assistance from fellow alumni</p>
 	                </div>
 	            </div>
 	        </div>
 	    </section>
 
+	    <div class="modal fade worksModal">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title worksModalTitle">
+							MR - Connect - The Way it Works!
+						</h4>
+					</div>
 
+					<!-- for the modal body -->
+					<div class="modal-body worksModalBody">
 
+						<div class="row">
+			                <div class="text-center">
+			                    <h2 class="section-heading">How MR - Connect Works</h2>
+			                </div>
+			            </div>
 
-		<!-- <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mainWrapper">
-			<p class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2 col-xs-8 col-xs-offset-2 headerText">
-				Welcome, to the new Awesome Network
-				<button id="btnLogin" class="btn btn-lg btn-primary" onclick="login()">
-					Get Started Now!
-				</button>
-			</p>
-		</div>    -->
+			            <div class="row" style="margin: 5% 0% 0% 0%;">
+			            	<ul class="timeline">
+		                        <li>
+		                            <div class="timeline-image">
+		                                <img class="img-circle img-responsive" alt="">
+		                            </div>
+		                            <div class="timeline-panel">
+		                                <div class="timeline-heading">
+		                                    <h4 class="subheading">LOGIN!</h4>
+		                                </div>
+		                                <div class="timeline-body">
+		                                    <p class="text-muted">Login using your LinkedIn Credentials. Since, this is a professional network, we'd take your Basic Profile info, Education and Experiences info only. </p>
+		                                </div>
+		                            </div>
+		                        </li>
+
+		                        <li class="timeline-inverted">
+		                            <div class="timeline-image">
+		                                <img class="img-circle img-responsive" alt="">
+		                            </div>
+		                            <div class="timeline-panel">
+		                                <div class="timeline-heading">
+		                                    <h4 class="subheading">There's some to Guide you!</h4>
+		                                </div>
+		                                <div class="timeline-body">
+		                                    <p class="text-muted">You seek guidance in a specific field. say, CFA or GMAT or CAT etc.</p>
+		                                </div>
+		                            </div>
+		                        </li>
+
+		                        <li>
+		                            <div class="timeline-image">
+		                                <img class="img-circle img-responsive" alt="">
+		                            </div>
+		                            <div class="timeline-panel">
+		                                <div class="timeline-heading">
+		                                    <h4 class="subheading">Explore MR - Connect</h4>
+		                                </div>
+		                                <div class="timeline-body">
+		                                    <p class="text-muted">Visit 'Our Network' and also make use of the 'Search Network' option to find awesome people, all under the umbrella of MR - Connect</p>
+		                                </div>
+		                            </div>
+		                        </li>
+
+		                        <li class="timeline-inverted">
+		                            <div class="timeline-image">
+		                                <img class="img-circle img-responsive" alt="">
+		                            </div>
+		                            <div class="timeline-panel">
+		                                <div class="timeline-heading">
+		                                    <h4 class="subheading">Start Connecting!</h4>
+		                                </div>
+		                                <div class="timeline-body">
+		                                    <p class="text-muted">Send a connection request to a relevant person</p>
+		                                </div>
+		                            </div>
+		                        </li>
+
+		                        <li>
+		                            <div class="timeline-image">
+		                                <img class="img-circle img-responsive" alt="">
+		                            </div>
+		                            <div class="timeline-panel">
+		                                <div class="timeline-heading">
+		                                    <h4 class="subheading">We Moderate MR - Connect!</h4>
+		                                </div>
+		                                <div class="timeline-body">
+		                                    <p class="text-muted">The connection requests will be moderated by the Mentored-Research team, who will facilitate a connection depending on the calendar of the expert and the urgency of the situation</p>
+		                                </div>
+		                            </div>
+		                        </li>
+	                        </ul>
+			            </div>
+
+					</div>   <!-- end of modal Body -->
+
+					<!-- for the footer -->
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div><!-- /.modal-content -->
+				</div><!-- /.modal-dialog -->
+			</div><!-- /.modal -->
+
 
 		<!-- for bootstrap CSS and JS files. Included here to improve the page load time -->
 		<link type="text/css" href="BootStrap/css/bootstrap-theme.css" rel="stylesheet" />
@@ -390,19 +509,20 @@
 		<script type="text/javascript" src="BootStrap/js/bootstrap.js"></script>
 
 		<!-- Bootstrap Core JavaScript -->
-	    <script src="js/bootstrap.min.js"></script>
+	    <!-- <script src="js/bootstrap.min.js"></script> -->
 
 	    <!-- Plugin JavaScript -->
-	    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+	    <!-- <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
 	    <script src="js/classie.js"></script>
-	    <script src="js/cbpAnimatedHeader.js"></script>
+	    <script src="js/cbpAnimatedHeader.js"></script> -->
 
 	    <!-- Contact Form JavaScript -->
-	    <script src="js/jqBootstrapValidation.js"></script>
+	    <!-- <script src="js/jqBootstrapValidation.js"></script> -->
 	    <!-- <script src="js/contact_me.js"></script> -->
 
 	    <!-- Custom Theme JavaScript -->
-	    <script src="js/agency.js"></script>
+	    <!-- <script src="js/agency.js"></script> -->
 
 	</body>
+
 </html>

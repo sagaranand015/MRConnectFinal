@@ -29,17 +29,41 @@
 		GetSearchList($_GET["searchKey"]);
 	}
 	else if(isset($_GET["no"]) && $_GET["no"] == "8") {   //for getting all the users from the database
-		GetSearchByExpertise($_GET["i1"], $_GET["i2"], $_GET["i5"], $_GET["i6"]);
+		GetSearchByExpertise($_GET["i1"], $_GET["i2"], $_GET["i5"], $_GET["i6"], $_GET["i7"]);
 	}
 	else if(isset($_GET["no"]) && $_GET["no"] == "9") {   
-		SendConnectionRequestToAdmin($_GET["requestFrom"], $_GET["requestForEmail"], $_GET["requestForId"]);
+		SendConnectionRequestToAdmin($_GET["requestFrom"], $_GET["requestForEmail"], $_GET["requestForId"], $_GET["requestText"]);
+	}
+	else if(isset($_GET["no"]) && $_GET["no"] == "10") {   
+		UpdateUserAssociation($_GET["email"], $_GET["id"], $_GET["userAssoc"]);
 	}
 	else {
 		echo "Nothing to be returned by the AJAX call. No Parameter does not match any value.";
 	}
 
+	//this is the function to update user Association with MR
+	function UpdateUserAssociation($email, $id, $userAssoc) {
+		global $connection;
+		$res = "";
+		try {
+			$query = "update Users set UserAssociation='$userAssoc' where UserEmail='$email' and UserID='$id'";
+			$rs = mysql_query($query);
+			if(!$rs) {
+				$res = "-1";
+			}
+			else {
+				$res = "1";
+			}
+			echo $res;
+		}
+		catch(Exception $e) {
+			$res = "-1";
+			echo $res;
+		}
+	}
+
 	//this is the function to send the connection request by mail TO ADMIN
-	function SendConnectionRequestToAdmin($requestFrom, $requestForEmail, $requestForId) {
+	function SendConnectionRequestToAdmin($requestFrom, $requestForEmail, $requestForId, $requestText) {
 		$res = "";
 		$mailbody = "";
 		$requestFromName = GetUserName($requestFrom);
@@ -51,7 +75,7 @@
 		}
 
 		// for getting the interests of the requested person.
-		$requestedInt = "<div class='list-group'>";
+		$requestedInt = "<div class='list-group'><br />";
 		$interests = getInterests($requestForEmail, $requestForId);
 		$in = explode(" @I ", $interests);
 		foreach ($in as $i) {
@@ -71,6 +95,7 @@
 			$mailbody .= "Dear Admin, <br /> MR - Connect Request from <b>" . $requestFromName . "(" . $requestFrom . ")</b> has been received. <br /><br />";
 			$mailbody .= "This request has been made FOR <b>" . $requestForName .  "(" . $requestForEmail . ")</b>. Following are the Areas of Expertise of the Requested Person: ";
 			$mailbody .= $requestedInt;
+			$mailbody .= "<br /><br/>Here is the Request Text associated with this request: <b>" . $requestText . "</b>";
 
 			$mailbody .= "<br /><br />Please take the necessary actions as required. Thank You.<br />Sent from the Tech Team Server.";
 
@@ -99,11 +124,11 @@
 	}
 
 	//this is the function to get the list of searched contacts by interests.
-	function GetSearchByExpertise($i1, $i2, $i5, $i6) {
+	function GetSearchByExpertise($i1, $i2, $i5, $i6, $i7) {
 		global $connection;
 		$res = "";
 		try {
-			$res = SearchByExpertise($i1, $i2, $i5, $i6);
+			$res = SearchByExpertise($i1, $i2, $i5, $i6, $i7);
 			echo $res;
 		}
 		catch(Exception $e) {
@@ -181,7 +206,7 @@
 		$res = "";
 		$date = date("Y-m-d H:i:s");		
 		try {
-			if(getInterests($email, $id) == "") {
+			if(getInterests($email, $id) == "" || getInterests($email, $id) == "-3") {
 				// insert here. User record does not exists in the database.
 				if(InsertInterests($id, $email, $i1, $i2, $i3, $i4, $i5, $i6, $i7, $date) == "1") {
 					$res = "1";
@@ -211,6 +236,7 @@
 	//this is the function to load the data from the database and show it to the Front end.
 	function LoadData($email, $id) {
 		$res = "";
+		$res2 = "";
 		$id = "";
 		$per = ""; 
 		$edu = ""; 
@@ -230,59 +256,55 @@
 				$res = "-2";  //user does not exists. Add the user here.
 			}
 			else {
-				// //now, load the data since user exists.  (Check this!!)
-				// if(getPersonalData($email, $id) == "-1") {
-				// 	$res = "-3";
-				// }
-				// else {
-				// 	$res = getPersonalData($email, $id) . " @bk ";
-				// 	$res .= getEducationData($email, $id) . " @bk ";
-				// 	$res .= getExperienceData($email, $id) . " @bk ";
-				// 	$res .= getInterests($email, $id);
-				// }
-
 				$per = getPersonalData($email, $id);
 				$edu = getEducationData($email, $id);
 				$exp = getExperienceData($email, $id);
 				$intr = getInterests($email, $id);
 
 				if($per == "" || $per == "-1") {
-					$res = "-4";
-					echo $res;
-					return;
+					$res2 = "-4";
+					$res .= "-4" . " @bk ";
+					// echo $res;
+					// return;
 				}
 				else {
 					$res .= $per . " @bk ";
 				}
 
 				if($edu == "" || $edu == "-1") {
-					$res = "-4";
-					echo $res;
-					return;
+					$res2 = "-4";
+					$res .= "-4" . " @bk ";
+					// echo $res;
+					// return;
 				}
 				else {
 					$res .= $edu . " @bk ";
 				}
 
 				if($exp == "" || $exp == "-1") {
-					$res = "-4";
-					echo $res;
-					return;
+					$res2 = "-4";
+					$res .= "-4" . " @bk ";
+					// echo $res;
+					// return;
 				}
 				else {
 					$res .= $exp . " @bk ";
 				}
 
 				if($intr == "" || $intr == "-1") {
-					$res = "-4";
-					echo $res;
-					return;
+					$res2 = "-4";
+					$res .= "-4" . " @bk ";
+					// echo $res;
+					// return;
+				}
+				else if($intr == "-3") {
+					$res .= "-5" . " @bk ";    // -5 is for when the data row does not exists.
 				}
 				else {
-					$res .= $intr;
+					$res .= $intr . " @bk ";
 				}
 			}
-			echo $res;
+			echo $res . " ~ " . $res2;
 		}
 		catch(Exception $e) {
 			$res = "-1";
@@ -450,9 +472,7 @@
 				}
 			}
 			else if(checkIfUserExists($email) == "1") {
-				//User Email Already exist. this should not be reached.
-				$res = "//User Email Already exist. this should not be reached. Or else, this should be for loading the data from the database and then showing it into the Profile page.";
-				//here, return something to show that the record already exists. After that, load data from the datanase!!
+				$res = "2";
 			}
 			else {
 				//Error in checking if the user already exists or not.

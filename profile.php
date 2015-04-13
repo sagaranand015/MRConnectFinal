@@ -261,8 +261,8 @@
 				var popup = $('#popup').fadeOut();    			
 
 	        	//set the "id" cookie here.
-	        	alertMsg.children('p').remove();
-	        	alertMsg.append("<p>Getting profile info... Please wait</p>").fadeIn();
+	        	// alertMsg.children('p').remove();
+	        	// alertMsg.append("<p>Getting profile info... Please wait</p>").fadeIn();
 				$.ajax({
 					type: "GET",
 					url: "AJAXFunctions.php/SetCookieID",
@@ -278,7 +278,7 @@
 						}
 					},
 					error: function(response) {
-						alert("ERROR in setting ID Cookie.");
+						//alert("ERROR in setting ID Cookie.");
 					}
 				});
 
@@ -293,6 +293,232 @@
         			IN.User.authorize(onlyAuthenticate);
         		} 
 	        }   //end of the onLinkedInLoad function!!
+
+	        function populateData(response) {
+
+	        	var loaded = true;
+
+	        	console.log("I m in the populateData function.");
+
+	        	var alertMsg = $('#alertMsg').fadeOut();
+				var popup = $('#popup').fadeOut();    	
+
+				if(response == "-1") {
+    				alert("Error in Executing the function.");
+    			}
+    			else if(response == "") {
+    				alert("Could not retrieve the data from the database. Please try again.");
+    			}
+    			else if(response == "-2") {
+    				IN.User.authorize(linkedInAuth);
+    			}
+    			else {
+
+    				var pers = response.split(" @bk ")[0];
+    				var educt = response.split(" @bk ")[1];
+    				var expr = response.split(" @bk ")[2];
+    				var intr = response.split(" @bk ")[3];
+
+    				console.log(pers + " --> " + educt  + " --> " + expr  + " --> " + intr);
+
+    				if(pers == undefined || pers == "-4") {
+    					loaded = false;
+    					popup.children('p').remove();
+    					popup.append("<p>Unable to retrieve your profile data. Please try again.</p>").fadeIn();
+    				}
+    				else {
+    					//for the personal contact thing of the user
+	    				var perDetails = pers.split(" ,& ");
+
+	    				$('#headName').text(perDetails[1]);
+	                    $('.displayImg').attr('src', perDetails[2]);  
+
+	                    $('.name').children('span').html(perDetails[1]);
+	                    $('.name').attr('data-content', perDetails[1]);
+
+	                    $('.email').children('span').html(perDetails[0]);
+	                    $('.email').attr('data-content', perDetails[0]);
+
+	                    $('.contact').children('span').html(perDetails[3]);
+	                	$('.contact').attr('data-content', perDetails[3]);
+
+	                    $('.address').children('span').html(perDetails[5]);
+	                    $('.address').attr('data-content', perDetails[5]);	    
+
+	                    $('.profile').children('span').children('a').attr("href", perDetails[4]);
+	                    $('.profile').attr('data-content', perDetails[4]);	
+
+	                    $('.blog').children('span').html(perDetails[6]);
+	                    $('.blog').children('span').html(perDetails[6]);
+
+	                    $('.lastAssoc').val(perDetails[9]);
+	                    $('.lastAssoc').attr('data-content', perDetails[9]);
+    				}
+
+    				if(educt == undefined || educt == "-4") {
+    					loaded = false;
+    					popup.children('p').remove();
+    					popup.append("<p>Unable to retrieve your profile data. Please try again.</p>").fadeIn();
+    				}
+    				else {
+    					//now, for populating the Education fields.
+	                    var e = educt.split(" @E ");
+	                    //for removing the tables!
+	                	$('.education').children('table').remove();
+	                    var markup = "";
+	                    for(var i = 0;i<=e.length-4;i+=4) {
+							markup += "<table class='table table-responsive table-striped eduTable'><tr><td><p id='eduSchoolName class='schoolName' data-content='" + e[i] + "'><span>" + e[i] + "</span><a class='glyphicon glyphicon-pencil eduEditButton' aria-hidden='true'></a></p></td><tr><td><p id='eduDate' class='date' data-content='" + e[i+1] + " - " + e[i+1] + "'><span>" + e[i+1] + " - " + e[i+1] + "</span><a class='glyphicon glyphicon-pencil eduEditButton' aria-hidden='true'></a></p></td></tr><tr><td><p id='eduDegree' class='degree' data-content='" + e[i+3] +  "'><span>" + e[i+3] +  "</span><a class='glyphicon glyphicon-pencil eduEditButton' aria-hidden='true'></a></p></tr><tr></td><td><p id='eduFOS' class='fos' data-content='" + e[i+2] + "'><span>" + e[i+2] + "</span><a class='glyphicon glyphicon-pencil eduEditButton' aria-hidden='true'></a></p>	</td></tr></table>";		                    	
+	                    }
+	                    $('.education').append(markup);
+
+	                    //for all the events that happen to the dynamic elements!
+	                    var eduEditButton = $('.eduEditButton').hide();
+	                    var eduTable = $('.eduTable');
+
+	                    // //for the on mouse over event on the Education Div
+	                    // eduTable.on('mouseover', function() {
+	                    // 	eduEditButton.show();
+	                    // 	return false;
+	                    // });
+
+	                    // //for the on mouse out event on the Education Listings Div
+	                    // eduTable.on('mouseout', function() {
+	                    // 	eduEditButton.hide();
+	                    // 	return false;
+	                    // });
+
+	                    var eduEditModal = $('.eduEditModal');
+	                    //for the click event of the edit button in the education Div!
+	                    eduEditButton.on('click', function() {
+
+	                		eduEditModal.modal('show');
+	                		$('.editEduModalTitle').html("Edit Your Education Listings");
+
+	                    	return false;
+	                    });
+	                    //for the update button in the update Education Listings!
+	                    $('.eduBtnUpdate').on('click', function() {
+	                    	alert("This is the update button for education listing");
+	                    	return false;
+	                    });
+    				}
+
+                    
+    				if(expr == undefined || expr == "-4") {
+    					loaded = false;
+    					popup.children('p').remove();
+    					popup.append("<p>Unable to retrieve your profile data. Please try again.</p>").fadeIn();
+    				}
+    				else {
+    					//for populating the Experience Fields
+	                    var ex = expr.split(" @Ex ");
+	                    var expMarkup = "";
+
+	                    $('.experience').children('table').remove();
+
+	                    for(var i = 0;i<=ex.length-4;i+=4) {
+							expMarkup += "<table class='table table-responsive table-striped expTable'><tr><td><p id='eduCompanyName class='companyName' data-content='" + ex[i] + "'><span>" + ex[i] + "</span><a class='glyphicon glyphicon-pencil expEditButton' aria-hidden='true'></a></p></td><tr><td><p id='expDate' class='date' data-content='" + ex[i+1] + " - " + ex[i+1] + "'><span>" + ex[i+1] + " - " + ex[i+1] + "</span><a class='glyphicon glyphicon-pencil expEditButton' aria-hidden='true'></a></p></td></tr><tr><td><p id='expTitle' class='title' data-content='" + ex[i+2] +  "'><span>" + ex[i+2] +  "</span><a class='glyphicon glyphicon-pencil expEditButton' aria-hidden='true'></a></p></tr><tr></td><td><p id='expSummary' class='summary' data-content='" + ex[i+3] + "'><span>" + ex[i+3] + "</span><a class='glyphicon glyphicon-pencil expEditButton' aria-hidden='true'></a></p>	</td></tr></table>";
+	                    }
+	                    $('.experience').append(expMarkup);
+
+	                    //for all the events that happen to the dynamic elements in the experience listings page!
+	                    var expEditButton = $('.expEditButton').hide();
+	                    var expTable = $('.expTable');
+
+	                    // //for the on mouse over event on the experience Div
+	                    // expTable.on('mouseover', function() {
+	                    // 	expEditButton.show();
+	                    // 	return false;
+	                    // });
+
+	                    // //for the on mouse out event on the experience Listings Div
+	                    // expTable.on('mouseout', function() {
+	                    // 	expEditButton.hide();
+	                    // 	return false;
+	                    // });
+
+	                    var expEditModal = $('.expEditModal');
+
+	                    //for the click event of the edit button in the Experience Div!
+	                    expEditButton.on('click', function() {
+	                		expEditModal.modal('show');
+	                		$('.editExpModalTitle').html("Edit Your Experience Listings");
+	                    	return false;
+	                    });
+
+	                    //for the update button in the update Education Listings!
+	                    $('.expBtnUpdate').on('click', function() {
+	                    	alert("This is the update button for Experience listing");
+	                    	return false;
+	                    });
+    				}
+
+    				if(intr == undefined || intr == "-4") {
+    					loaded = false;
+    					popup.children('p').remove();
+    					popup.append("<p>Unable to retrieve your profile data in Interests. Please try again.</p>").fadeIn();
+    				}
+    				else if(intr == "-5") {  //this is when the data row does not exists.
+    					loaded = false;
+    					$('#AOE').trigger('click');
+    					popup.children('p').remove();
+    					popup.append("<p>Please fill in your Areas of Expertise for the MR - Connect member community.</p>").fadeIn();
+    				}
+    				else {
+    					//to load the data from the Interest Table and show it on the Page.
+	                    var interests = intr.split(" @I ");
+	                   	if(interests[0] == "") {
+	                   	}
+	                   	else {
+	                   		$('#txtGmatIntArea').parent('a').addClass('list-group-item-success');
+	                   	}
+	                   	if(interests[1] == "") {
+	                   	}
+	                   	else {
+	                   		$('#txtCatIntArea').parent('a').addClass('list-group-item-success');
+	                   	}
+	                   	if(interests[2] == "") {
+	                   	}
+	                   	else {
+	                   		$('#txtEducationIntArea').parent('a').addClass('list-group-item-success');
+	                	 	$('#txtEducationIntArea').val(interests[2]);
+	                   	}
+	                   	if(interests[3] == "") {
+	                   	}
+	                   	else {
+	                   	 	$('#txtWorkExpIntArea').parent('a').addClass('list-group-item-success');
+	                     	$('#txtWorkExpIntArea').val(interests[3]);
+	                   	}
+	                    if(interests[4] == "") {
+	                   	}
+	                   	else {
+	                   		$('#txtCfaIntArea').parent('a').addClass('list-group-item-success');
+	                   	}
+	                   	if(interests[5] == "") {
+	                   	}
+	                   	else {
+	                   		$('#txtFrmIntArea').parent('a').addClass('list-group-item-success');
+	                   	}
+	                   	if(interests[6] == "") {
+	                   	}
+	                   	else {
+	                   		$('#txtCustomIntArea').parent('a').addClass('list-group-item-success');
+	                   		$('#txtCustomIntArea').val(interests[6]);
+	                   	}	
+    				}
+                    
+    			}
+    			alertMsg.children('p').remove();
+    			alertMsg.fadeOut();
+
+    			//to show the interests here. Trigger the interest click here, for scrolling.
+    			if(loaded == true) {
+    				popup.children('p').remove();
+	    			popup.append("<p class='expertisePopup'>We hope you have filled in your Areas of Expertise. Please do so, to help build a better MR - Connect. Ignore if already done.&nbsp;&nbsp;<a class='scrolly backToTop' href='#bodyTop'>Back to Top</a></p>").fadeIn();
+	    			$('#AOE').trigger('click');
+    			}
+
+	        }    //end of populateData()
 
 	        //this is the function for only authentication.
 	        function onlyAuthenticate() {
@@ -314,185 +540,23 @@
 	        		},
 	        		success: function(response) {
 
-	        			if(response == "-1") {
-	        				alert("Error in Executing the function.");
+	        			var res = response.split(" ~ ");
+	        			response = res[0];
+	        			var res2 = res[1];
+
+	        			if(res2 == "-4") {    //data not loaded successfully.
+        					// populateData(response);
+        					alertMsg.children('p').remove();
+        					alertMsg.fadeOut();
+        					popup.children('p').remove();
+        					alertMsg.append("<p>Oops! We enountered an error in getting your profile data. Please refresh or try again later.</p>").fadeIn();
 	        			}
-	        			else if(response == "") {
-	        				alert("Could not retrieve the data from the database. Please try again.");
+	        			else {    //data is loaded successfully and ready to be shown to the user.
+	        				//populateData(response);
 	        			}
-	        			else if(response == "-2") {
-	        				IN.User.authorize(linkedInAuth);
-	        			}
-	        			else if(response == "-3") {
-	        				alert("The id could not be set for some reason.");
-	        			}
-	        			else if(response == "-4") {
-	        				alert("The RESPONSE parameters are not correct!!. Please try again.");
-	        			}
-	        			else {
 
-	        				var pers = response.split(" @bk ")[0];
-	        				var educt = response.split(" @bk ")[1];
-	        				var expr = response.split(" @bk ")[2];
-	        				var intr = response.split(" @bk ")[3];
-
-	        				//for the personal contact thing of the user
-	        				var perDetails = pers.split(" ,& ");
-
-	        				$('#headName').text(perDetails[1]);
-		                    $('.displayImg').attr('src', perDetails[2]);  
-
-		                    $('.name').children('span').html(perDetails[1]);
-		                    $('.name').attr('data-content', perDetails[1]);
-
-		                    $('.email').children('span').html(perDetails[0]);
-		                    $('.email').attr('data-content', perDetails[0]);
-
-		                    $('.contact').children('span').html(perDetails[3]);
-	                    	$('.contact').attr('data-content', perDetails[3]);
-
-		                    $('.address').children('span').html(perDetails[5]);
-		                    $('.address').attr('data-content', perDetails[5]);	    
-
-		                    $('.profile').children('span').children('a').attr("href", perDetails[4]);
-		                    $('.profile').attr('data-content', perDetails[4]);	
-
-		                    $('.blog').children('span').html(perDetails[6]);
-		                    $('.blog').children('span').html(perDetails[6]);
-
-		                    $('.lastAssoc').val(perDetails[7]);
-		                    $('.lastAssoc').attr('data-content', perDetails[7]);
-
-		                    $('.lastType').val(perDetails[8]);
-		                    $('.lastType').attr('data-content', perDetails[8]);
-
-		                    //now, for populating the Education fields.
-		                    var e = educt.split(" @E ");
-		                    //for removing the tables!
-	                    	$('.education').children('table').remove();
-		                    var markup = "";
-		                    for(var i = 0;i<=e.length-4;i+=4) {
-								markup += "<table class='table table-responsive table-striped eduTable'><tr><td><p id='eduSchoolName class='schoolName' data-content='" + e[i] + "'><span>" + e[i] + "</span><a class='glyphicon glyphicon-pencil eduEditButton' aria-hidden='true'></a></p></td><tr><td><p id='eduDate' class='date' data-content='" + e[i+1] + " - " + e[i+1] + "'><span>" + e[i+1] + " - " + e[i+1] + "</span><a class='glyphicon glyphicon-pencil eduEditButton' aria-hidden='true'></a></p></td></tr><tr><td><p id='eduDegree' class='degree' data-content='" + e[i+3] +  "'><span>" + e[i+3] +  "</span><a class='glyphicon glyphicon-pencil eduEditButton' aria-hidden='true'></a></p></tr><tr></td><td><p id='eduFOS' class='fos' data-content='" + e[i+2] + "'><span>" + e[i+2] + "</span><a class='glyphicon glyphicon-pencil eduEditButton' aria-hidden='true'></a></p>	</td></tr></table>";		                    	
-		                    }
-		                    $('.education').append(markup);
-
-		                    //for all the events that happen to the dynamic elements!
-		                    var eduEditButton = $('.eduEditButton').hide();
-		                    var eduTable = $('.eduTable');
-
-		                    // //for the on mouse over event on the Education Div
-		                    // eduTable.on('mouseover', function() {
-		                    // 	eduEditButton.show();
-		                    // 	return false;
-		                    // });
-
-		                    // //for the on mouse out event on the Education Listings Div
-		                    // eduTable.on('mouseout', function() {
-		                    // 	eduEditButton.hide();
-		                    // 	return false;
-		                    // });
-
-		                    var eduEditModal = $('.eduEditModal');
-		                    //for the click event of the edit button in the education Div!
-		                    eduEditButton.on('click', function() {
-
-		                		eduEditModal.modal('show');
-		                		$('.editEduModalTitle').html("Edit Your Education Listings");
-
-		                    	return false;
-		                    });
-		                    //for the update button in the update Education Listings!
-		                    $('.eduBtnUpdate').on('click', function() {
-		                    	alert("This is the update button for education listing");
-		                    	return false;
-		                    });
-
-		                    //for populating the Experience Fields
-		                    var ex = expr.split(" @Ex ");
-		                    var expMarkup = "";
-
-		                    $('.experience').children('table').remove();
-
-		                    for(var i = 0;i<=ex.length-4;i+=4) {
-								expMarkup += "<table class='table table-responsive table-striped expTable'><tr><td><p id='eduCompanyName class='companyName' data-content='" + ex[i] + "'><span>" + ex[i] + "</span><a class='glyphicon glyphicon-pencil expEditButton' aria-hidden='true'></a></p></td><tr><td><p id='expDate' class='date' data-content='" + ex[i+1] + " - " + ex[i+1] + "'><span>" + ex[i+1] + " - " + ex[i+1] + "</span><a class='glyphicon glyphicon-pencil expEditButton' aria-hidden='true'></a></p></td></tr><tr><td><p id='expTitle' class='title' data-content='" + ex[i+2] +  "'><span>" + ex[i+2] +  "</span><a class='glyphicon glyphicon-pencil expEditButton' aria-hidden='true'></a></p></tr><tr></td><td><p id='expSummary' class='summary' data-content='" + ex[i+3] + "'><span>" + ex[i+3] + "</span><a class='glyphicon glyphicon-pencil expEditButton' aria-hidden='true'></a></p>	</td></tr></table>";
-		                    }
-		                    $('.experience').append(expMarkup);
-
-		                    //for all the events that happen to the dynamic elements in the experience listings page!
-		                    var expEditButton = $('.expEditButton').hide();
-		                    var expTable = $('.expTable');
-
-		                    // //for the on mouse over event on the experience Div
-		                    // expTable.on('mouseover', function() {
-		                    // 	expEditButton.show();
-		                    // 	return false;
-		                    // });
-
-		                    // //for the on mouse out event on the experience Listings Div
-		                    // expTable.on('mouseout', function() {
-		                    // 	expEditButton.hide();
-		                    // 	return false;
-		                    // });
-
-		                    var expEditModal = $('.expEditModal');
-
-		                    //for the click event of the edit button in the Experience Div!
-		                    expEditButton.on('click', function() {
-		                		expEditModal.modal('show');
-		                		$('.editExpModalTitle').html("Edit Your Experience Listings");
-		                    	return false;
-		                    });
-
-		                    //for the update button in the update Education Listings!
-		                    $('.expBtnUpdate').on('click', function() {
-		                    	alert("This is the update button for Experience listing");
-		                    	return false;
-		                    });
-
-		                    //to load the data from the Interest Table and show it on the Page.
-		                    var interests = intr.split(" @I ");
-		                   	if(interests[0] == "") {
-		                   	}
-		                   	else {
-		                   		$('#txtGmatIntArea').parent('a').addClass('list-group-item-success');
-		                   	}
-		                   	if(interests[1] == "") {
-		                   	}
-		                   	else {
-		                   		$('#txtCatIntArea').parent('a').addClass('list-group-item-success');
-		                   	}
-		                   	if(interests[2] == "") {
-		                   	}
-		                   	else {
-		                   		$('#txtEducationIntArea').parent('a').addClass('list-group-item-success');
-	                    	 	$('#txtEducationIntArea').val(interests[2]);
-		                   	}
-		                   	if(interests[3] == "") {
-		                   	}
-		                   	else {
-		                   	 	$('#txtWorkExpIntArea').parent('a').addClass('list-group-item-success');
-		                     	$('#txtWorkExpIntArea').val(interests[3]);
-		                   	}
-		                    if(interests[4] == "") {
-		                   	}
-		                   	else {
-		                   		$('#txtCfaIntArea').parent('a').addClass('list-group-item-success');
-		                   	}
-		                   	if(interests[5] == "") {
-		                   	}
-		                   	else {
-		                   		$('#txtFrmIntArea').parent('a').addClass('list-group-item-success');
-		                   	}
-		                   	if(interests[6] == "") {
-		                   	}
-		                   	else {
-		                   		$('#txtCustomIntArea').parent('a').addClass('list-group-item-success');
-		                   		$('#txtCustomIntArea').val(interests[6]);
-		                   	}
-
-	        			}
-	        			alertMsg.children('p').remove();
-	        			alertMsg.fadeOut();
+	        			//to show the data to the page 
+	        			populateData(response);
 	        		},
 	        		error: function(response) {
 	        			alert("Error in getting the data from the database. " + response.responseText);
@@ -555,12 +619,18 @@
 	                    		var userEmail = resArr[1];
 	                    		var userID = resArr[2];
 
+	                    		// in case, the cookies do not exist on client's computer, but the user is there in the database.
 	                    		setCookie("userEmail", userEmail, 150);
 	                    		setCookie("userID", userID, 150);
 
 	                    		if(response == "1") {
 	                    			alertMsg.children('p').remove();
 	                    			popup.append("<p>Data saved Successfully. Please go ahead and fill in your areas of Expertise.</p>").fadeIn();
+	                    		}
+	                    		else if(response == "2") {
+	                    			alertMsg.children('p').remove();
+	                    			alertMsg.append("<p>Getting Profile Data... Please wait</p>");
+	                    			onlyAuthenticate();
 	                    		}
 	                    		else {
 	                    			alert("Error in saving the data. Please try again." + response);	
@@ -793,6 +863,12 @@
 				var alertMsg = $('#alertMsg').fadeOut();
 				var popup = $('#popup').fadeOut();    			
 
+				$('#btnExitPopup').on('click', function() {
+					popup.children('p').remove();
+					popup.fadeOut();
+					return false;
+				});
+
 				//for the scrolling thing!
 				$('.scrolly').scrolly();
 
@@ -867,6 +943,9 @@
 				//this is for the saving/updating of the interests
 				$('#btnInterest').on('click', function() {
 
+					popup.children('p').remove();
+					popup.fadeOut();
+
 					var i1 = "", i2 = "", i3 = "", i4 = "", i5 = "", i6 = "", i7 = "";
 					if ($('#txtGmatIntArea').parent('a').hasClass('list-group-item-success')) {
 						i1 = "G.M.A.T.";
@@ -877,13 +956,13 @@
 					if ($('#txtEducationIntArea').parent('a').hasClass('list-group-item-success')) {
 						i3 = $('#txtEducationIntArea').val();
 						if (i3 == "") {
-							i3 = "Education";
+							i3 = "EducationDefined";
 						}
 					}
 					if ($('#txtWorkExpIntArea').parent('a').hasClass('list-group-item-success')) {
 						i4 = $('#txtWorkExpIntArea').val();
 						if (i4 == "") {
-							i4 = "WorkExperience";
+							i4 = "WorkExperienceDefined";
 						}
 					}
 					if ($('#txtCfaIntArea').parent('a').hasClass('list-group-item-success')) {
@@ -894,40 +973,103 @@
 					}
 					if ($('#txtCustomIntArea').parent('a').hasClass('list-group-item-success')) {
 						i7 = $('#txtCustomIntArea').val();
+						if(i7 == "") {
+							i7 = "CustomDefined";
+						}
 					}
 
 					//now, save the data into the Intersts table with the given values.
+					if(i3 == "EducationDefined") {
+						popup.children('p').remove();
+						popup.append("<p>Please fill in your Education Expertise in a bit more detail before we save it to MR - Connect.</p>").fadeIn();
+					}
+					else if(i4 == "WorkExperienceDefined") {
+						popup.children('p').remove();
+						popup.append("<p>Please fill in your Experience Expertise in a bit more detail before we save it to MR - Connect.</p>").fadeIn();	
+					}
+					else if(i7 == "CustomDefined") {
+						popup.children('p').remove();
+						popup.append("<p>Please explain your Custom Expertise field in a bit more detail before we save it to MR - Connect.</p>").fadeIn();							
+					}
+					else {
+
+						alertMsg.children('p').remove();
+						alertMsg.append("<p>Saving your Area(s) of expertise... Please wait</p>").fadeIn();
+						$.ajax({
+							type: "GET",
+							url: "AJAXFunctions.php/SaveUpdateInterests",
+							data: {
+								no: "3", id: getCookie("userID"), email: getCookie("userEmail"), i1: i1, i2: i2, i3: i3, i4: i4, i5: i5, i6: i6, i7: i7
+							},
+							success: function(response) {
+								if(response == "1") {
+									alertMsg.children('p').remove();
+									alertMsg.fadeOut();
+									popup.append("<p>And We're done.</p>").fadeIn();
+								}
+								else {
+									alertMsg.children('p').remove();
+									alertMsg.fadeOut();
+									popup.append("<p>Oops! We encountered an error. Please try again.</p>").fadeIn();
+								}
+							},
+							error: function() {
+								alertMsg.children('p').remove();
+								alertMsg.fadeOut();
+								popup.append("<p>Oops! We encountered an error. Please try again.</p>").fadeIn();
+							}
+						});
+
+					}
+					return false;
+				});
+
+				// to save the user Association thing
+				$('#btnUserAssociation').on('click', function() {
+
+					var userAssoc = $('#userAssoc').val();
+
 					alertMsg.children('p').remove();
-					alertMsg.append("<p>Saving your Area(s) of expertise... Please wait</p>").fadeIn();
+					alertMsg.append("<p>Please wait while we update your Association Status with Mentored-Research... Please wait</p>").fadeIn();
 					$.ajax({
 						type: "GET",
-						url: "AJAXFunctions.php/SaveUpdateInterests",
+						url: "AJAXFunctions.php",
 						data: {
-							no: "3", id: getCookie("userID"), email: getCookie("userEmail"), i1: i1, i2: i2, i3: i3, i4: i4, i5: i5, i6: i6, i7: i7
+							no: "10", email: getCookie("userEmail"), id: getCookie("userID"), userAssoc: userAssoc
 						},
 						success: function(response) {
 							if(response == "1") {
 								alertMsg.children('p').remove();
 								alertMsg.fadeOut();
-								popup.append("<p>And We're done.</p>").fadeIn();
+								//popup.children('p').remove();
+								popup.append("<p>Successfully updated your Association. Please continue exploring the MR - Connect.</p>").fadeIn();
 							}
 							else {
 								alertMsg.children('p').remove();
 								alertMsg.fadeOut();
-								popup.append("<p>Oops! We encountered an error. Please try again.</p>").fadeIn();
+								popup.children('p').remove();
+								popup.append("<p>Oops! We had an error updating your Association. Please try again.</p>").fadeIn();	
 							}
 						},
 						error: function() {
-							alertMsg.children('p').remove();
-							alertMsg.fadeOut();
-							popup.append("<p>Oops! We encountered an error. Please try again.</p>").fadeIn();
+							alert("Error in AJAX.");
 						}
 					});
-					return false;
 				});
 
 			});
 		</script>
+
+		<script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+			ga('create', 'UA-61843203-1', 'auto');
+			ga('send', 'pageview');
+		</script>
+
 	</head>
 
 	<body id="bodyTop">
@@ -936,7 +1078,7 @@
 		</div>
 
 		<div id="popup" class="alert alert-danger" role="alert">
-			  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			  <button id="btnExitPopup" type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 		</div>
 
 		<!--  this is for the main first div -->
@@ -1029,6 +1171,29 @@
 				</table>
 
 				<p id="basicLastAss" class="lastAss" data-content="">
+					<span>Association with Mentored-Research</span>
+
+					<select class="form-control lastAssoc" id="userAssoc">
+						<option value="1">
+							ERI Alumnus
+						</option>
+						<option value="2">
+							BSE Alumnus
+						</option>
+						<option value="3">
+							Technical Analysis Alumnus
+						</option>
+						<option value="4">
+							Other
+						</option>
+					</select>
+
+					<button id="btnUserAssociation" class="btn btn-lg btn-primary btn-block" style="margin-top: 2%;">
+						Update your Association
+					</button>
+				</p>
+
+				<!-- <p id="basicLastAss" class="lastAss" data-content="">
 					<span>Last Associated with ERI in: </span>
 					<select class="form-control lastAssoc">
 						<option value="S2011">
@@ -1074,9 +1239,12 @@
 							Not Applicable
 						</option>
 					</select>
-					<!-- <a class="glyphicon glyphicon-pencil editButton" aria-hidden="true"></a> -->
-				</p> 
-			</div>   <!-- end of the Basic Profile div -->
+				</p>    -->
+
+
+
+
+			</div>    <!-- end of the Basic Profile div -->
 
 			<!-- this is for the education listings div -->
 			<div class="col-lg-8 col-md-8 col-sm-11 col-xs-11 education" id="educationDiv">
@@ -1130,13 +1298,13 @@
                     </a>
                     <a href="#" class="list-group-item" id="intArea5">
                         <h4 class="list-group-item-heading">C.F.A.</h4>
-                        <p class="list-group-item-text">Can help someone know more about the organization you worked for or are currently working with? Can help him/her with a referral? Have sound knowledge of your domain you are keen on sharing with others? Please select this option.</p>
+                        <p class="list-group-item-text">Can you help someone in their preparation for the CFA Level I, Level II, or Level III? Can you share your insights into preparation for this competitive charter?</p>
                         <br />
                         <input type="hidden" class="form-control" id="txtCfaIntArea"  />
                     </a>
                     <a href="#" class="list-group-item" id="intArea6">
                         <h4 class="list-group-item-heading">F.R.M.</h4>
-                        <p class="list-group-item-text">Can help someone know more about the organization you worked for or are currently working with? Can help him/her with a referral? Have sound knowledge of your domain you are keen on sharing with others? Please select this option.</p>
+                        <p class="list-group-item-text">Can you help someone in their preparation for the FRM Level 1 or Level II? Can you share your insights into preparation for this competitive exam?</p>
                         <br />
                         <input type="hidden" class="form-control" id="txtFrmIntArea"  />
                     </a>
