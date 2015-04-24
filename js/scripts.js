@@ -70,4 +70,13 @@ function showDiv(item) {
     ob.animate({
       top: '0px'
     }, 300);
+
+    // this is for making visible the others.
+    // var others = $('.divsSec');
+    // for(var i = 0;i<others.length;i++) {
+    //     $(others[i]).show();
+    //     $(others[i]).css({
+    //         top: '0px'
+    //     });
+    // }
 }

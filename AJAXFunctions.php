@@ -37,8 +37,95 @@
 	else if(isset($_GET["no"]) && $_GET["no"] == "10") {   
 		UpdateUserAssociation($_GET["email"], $_GET["id"], $_GET["userAssoc"]);
 	}
+	else if(isset($_GET["no"]) && $_GET["no"] == "11") {     // to get all the poll Questions.
+		GetPollQuestions();
+	}
+	else if(isset($_GET["no"]) && $_GET["no"] == "12") {     // to cast a vote for the selected Poll.
+		CastVote($_GET["id"], $_GET["email"], $_GET["checked"], $_GET["checkedName"]);
+	}
+	else if(isset($_GET["no"]) && $_GET["no"] == "13") {     // to get the result if the user has casted vote or not.
+		echo IsVoted($_GET["email"], $_GET["id"]);
+	}
+	else if(isset($_GET["no"]) && $_GET["no"] == "14") {     // to get the vote count for all the poll questions.
+		GetVoteCountPoll();
+	}	
+	else if(isset($_GET["no"]) && $_GET["no"] == "15") {     // to submit the questions given based on category
+		SubmitQuestions($_GET["id"], $_GET["email"], $_GET["category"], $_GET["question"]);
+	}	
 	else {
 		echo "Nothing to be returned by the AJAX call. No Parameter does not match any value.";
+	}
+
+	// this is the function to submit the asked question based on category
+	function SubmitQuestions($id, $email, $category, $question) {
+		$res = "-1";
+		$date = date("Y-m-d H:i:s");
+		try {
+			$res = SubmitAskedQuestions($id, $email, $category, $question, $date);
+			echo $res;
+		}
+		catch(Exception $e) {
+			$res = "-1";
+			echo $res;
+		}
+	}
+
+	// this is the function to get the vote count for all the question of the poll.
+	function GetVoteCountPoll() {
+		$res = "";
+		try {
+			$res = GetVoteCountPollQuestions();
+			echo $res;
+		}
+		catch(Exception $e) {
+			$res = "-1";
+			echo $res;
+		}
+	}
+
+	// this is the function tp cast the vote for the poll thing
+	function CastVote($id, $email, $checked, $checkedName) {
+		global $connection;
+		$res = "-1";
+		try {
+			if(IsVoted($email, $id) == "0") {   // user has not voted.
+				if(IncreaseVotes($checked, $checkedName) == "1") {  // vote made.
+					if(SetVotedStatusOfUser($email, $id, 1) == "1") {   // user table modified.
+						$res = "1";
+					}
+					else {
+						$res = "-2";    // -2 is when the user table is not updated.
+					}
+				}
+				else {
+					$res = "-3";   // -3 is when votes are not increased.
+				}
+			}	
+			else if(IsVoted($email, $id) == "1") {   // user has already voted.
+				$res = "-4";   // -4 is when the user has already voted.
+			}
+			else {  // error in IsVoted()
+				$res = "-1";
+			}
+			echo $res;
+		}
+		catch(Exception $e) {
+			$res = "-1";
+			echo $res;
+		}
+	}
+
+	// this is the function to get all the poll questions from the database.
+	function GetPollQuestions() {
+		$res = "-1";
+		try {
+			$res = GetPollQuestionsRadioList();
+			echo $res;
+		}
+		catch(Exception $e) {
+			$res = "-1";
+			echo $res;
+		}
 	}
 
 	//this is the function to update user Association with MR

@@ -63,11 +63,7 @@
 	    	}
 
 	    	.mainContent {
-	    		margin: 2% 0 0 0%;
-	    	}
-
-	    	.ourNetworkDiv {
-
+	    		margin: 2% 0% 0 0%;
 	    	}
 
 	    	.personItem {
@@ -87,15 +83,15 @@
 	    	}
 
 	    	.userName {
-	    		font-size: 2.8em;
+	    		font-size: 2.2em;
 	    		font-family: boldText;
 	    	}
 	    	.userLocation {
-	    		font-size: 2em;
+	    		font-size: 1.4em;
 	    		font-family: regularText;
 	    	}
 	    	.userExpertise {
-	    		font-size: 2em;
+	    		font-size: 1.4em;
 	    		font-family: regularText;
 	    	}
 	    	.userImage {
@@ -147,7 +143,7 @@
 
 			.btnConnRequest {
 				font-family: regularText;
-				margin: 1% 1% 1% 1%;
+				/*margin: 1% 1% 1% 1%;*/
 			}
 
 			#btnAdvSearch {
@@ -170,9 +166,231 @@
 			.tableContent {
 				font-family: boldText;	
 			}
+
+			.pollList a {
+				font-family: regularText;
+			}
+
+			#btnPollVote {
+				font-family: boldText;
+			}
+
+			.pollQuesDisplay {
+				font-family: boldText;
+			}
+
+			#askQuestion {
+				margin: 2% 0 2% 0%;
+			}
+
+			.searchList {
+				margin: 2% 0 0 0%;
+			}
+
+			.btnSeeMore {
+				margin: 3% 0 0 0%;
+			}
      	</style>
 
     	<script type="text/javascript">
+
+		// this is the function to get the See More button in the markup.
+		function getSeeMoreButton(n) {
+			$('.btnSeeMore').remove();
+
+			n = Number(n);
+			if(n == 10) {
+				n = 10;
+			}
+			else if(n%10 == 0) {
+				n += 10;
+			}
+
+			var btnMarkup = "<button class='btn btn-lg btn-primary btn-block btnSeeMore' data-number='" + n + "'>See More Records</button>";
+			return btnMarkup;
+		}
+
+		// this is the function to get 'n' users only at a time.
+		function getUsers(response, n) {
+			var users = response.split(" (BR) ");
+			var res = "";
+
+			for(var i=0;i<n;i++) {
+				if(users[i] == undefined) {
+
+				}
+				else {
+					res += users[i];
+				}
+			}
+			var seeMore = getSeeMoreButton(n);
+			return res + seeMore;
+		}
+
+		// this is the function to get all the data as list in the first go.
+		function populateUserData(noRecords) {
+
+			var alertMsg = $('#alertMsg').fadeOut();
+			var popup = $('#popup').fadeOut();    
+
+			$('#btnExitPopup').on('click', function() {
+				popup.children('p').remove();
+				popup.fadeOut();
+				return false;
+			});
+
+			//this is to get all the users from the database and show it in the list format.
+			$('.allList').children('div.list-group-item').remove();
+			$('.allList').children('div.list-group').remove();
+			$('.allList').children('.btn').remove();
+			alertMsg.children('p').remove();
+			alertMsg.append("<p>Building the MR - Network... Please wait</p>").fadeIn();
+			$.ajax({
+				type: "GET",
+				url: "AJAXFunctions.php",
+				data: {
+					no: "4"
+				},
+				success: function(response) {
+					if(response == "-1") {
+						alert("We encountered a error. Please try again.");
+					}
+					else {
+						var users = getUsers(response, noRecords);
+						$('.allList').append(users);
+
+						// for the popus and notifications.
+						alertMsg.children('p').remove();
+						alertMsg.fadeOut();
+					}
+				},
+				error: function() {
+					alert("This is the error in ajax.");
+				}
+			});
+		}
+
+    	// this is the function to show the poll Results on the RHS of the page.
+    	function getPollResults() {
+
+    		var alertMsg = $('#alertMsg').fadeOut();
+			var popup = $('#popup').fadeOut();    
+
+			$('#btnExitPopup').on('click', function() {
+				popup.children('p').remove();
+				popup.fadeOut();
+				return false;
+			});
+
+    		// show the questions and the votes incurred.
+    		$('.pollList').children('div.list-group-item').remove();
+			$.ajax({
+				type: "GET",
+				url: "AJAXFunctions.php",
+				data: {
+					no: "14"
+				},
+				success: function(resp) {
+					if(resp == "-1") {
+						popup.children('p').remove();
+						popup.append("<p>We could not load the Questions for your Poll. Please try again.</p>").fadeIn();
+					}
+					else {
+						
+						// put it to view here.!!
+						var r = resp.split(" && ");
+						var ques = "";
+						var votes = "";
+						var p = "";
+						var res = "<div class='list-group-item'>";
+						for(var i=0;i<r.length;i++) {
+							p = r[i].split(" -> ");
+							if(p == undefined || p == "") {
+
+							}
+							else {
+								ques = p[0];
+								votes = p[1];
+								res += "<p class='pollQuesDisplay'>" + ques + "<span style='float:right;'>(" + votes + " Votes)</span></p><div class='progress'><div class='progress-bar' role='progressbar'  aria-valuenow='" + votes + "' aria-valuemin='0' aria-valuemax='23' style='width:" + (votes/23)*100 + "%'></div></div>";
+							}
+						}
+
+						res += "</div>";
+						$('.pollList').append(res);
+
+					}
+				},
+				error: function() {
+					popup.children('p').remove();
+					popup.append("<p>We could not load the Questions for your Poll. Please try again.</p>").fadeIn();
+				}
+			});
+
+    	}
+
+    	// this is the function to show the Poll area on RHS. Either questions come or the number of votes casted.
+    	function populatePollArea() {
+
+    		var alertMsg = $('#alertMsg').fadeOut();
+			var popup = $('#popup').fadeOut();    
+
+			$('#btnExitPopup').on('click', function() {
+				popup.children('p').remove();
+				popup.fadeOut();
+				return false;
+			});
+
+    		// this is to get all the poll Questions from Database and show them!!
+			$('.pollList').children('div.list-group-item').remove();
+			// check if the user has voted or not. If no, show the questions. Otherwise the results.
+			$.ajax({
+				type: "GET",
+				url: "AJAXFunctions.php",
+				data: {
+					no: "13", id: getCookie("userID"), email: getCookie("userEmail")
+				},
+				success: function(response) {
+
+					if(response == "0") {   // DID NOT cast the vote yet!
+
+						$.ajax({
+							type: "GET",
+							url: "AJAXFunctions.php",
+							data: {
+								no: "11"
+							},
+							success: function(response) {
+								if(response == "-1") {
+									popup.children('p').remove();
+									popup.append("<p>We could not load the Questions for your Poll. Please try again.</p>").fadeIn();
+								}
+								else {
+									$('.pollList').append(response);
+								}
+							},
+							error: function() {
+								popup.children('p').remove();
+								popup.append("<p>We could not load the Questions for your Poll. Please try again.</p>").fadeIn();
+							}
+						});
+
+					}
+					else if(response == "1") {  // already casted the vote.
+						getPollResults();
+					}
+					else {   // error case.
+						popup.children('p').remove();
+						popup.append("<p>We could not load the Questions for your Poll. Please try again.</p>").fadeIn();
+					}
+				}, 
+				error: function() {
+					popup.children('p').remove();
+					popup.append("<p>We could not load the Questions for your Poll. Please try again.</p>").fadeIn();
+				}
+			});
+
+    	}   // end of populatePollArea.
+
     		$(document).ready(function() {
 
     			//for clearing the search bar
@@ -192,6 +410,7 @@
 
     			var ourNetworkDiv = $('.ourNetworkDiv').hide();
     			var searchDiv = $('.searchDiv').hide();
+    			var pollQuestionDiv = $('#pollQuestion');
 
     			//for the click events of the list on LHS
     			$('.ourNetwork').on('click', function() {
@@ -210,29 +429,8 @@
     			$('.ourNetwork').trigger('click');
 
     			//this is to get all the users from the database and show it in the list format.
-    			$('.allList').children('div.list-group-item').remove();
-    			alertMsg.children('p').remove();
-    			alertMsg.append("<p>Building the MR - Network... Please wait</p>").fadeIn();
-    			$.ajax({
-    				type: "GET",
-    				url: "AJAXFunctions.php",
-    				data: {
-    					no: "4"
-    				},
-    				success: function(response) {
-    					if(response == "-1") {
-    						alert("We encountered a error. Please try again.");
-    					}
-    					else {
-							$('.allList').append(response);
-							alertMsg.children('p').remove();
-							alertMsg.fadeOut();
-    					}
-    				},
-    				error: function() {
-    					alert("This is the error in ajax.");
-    				}
-    			});
+    			// 10 is the first time the page is getting loaded.
+    			populateUserData(10);
 
     			//for the read more click link
     			$('.allList, .searchList').delegate('.readMoreLink', 'click', function() {
@@ -374,52 +572,55 @@
 					var requestForEmail = $(this).attr('data-email');
 					var requestForId = $(this).attr('data-id');
 
-					//alert(getCookie("userEmail") + " --> " + requestForEmail + " --> " + id);
+					var profile = $(this).attr('data-profile');
+					window.open(profile, "_blank");
 
-					$('.modalText').html("<h3>Just a step more!<br /> Please let us know the reason you want to send the connection request to the concerned person. It'll help us in keeping things sorted.</h3>");
-					$('.connModal').modal('show');
+					// //alert(getCookie("userEmail") + " --> " + requestForEmail + " --> " + id);
 
-					//write the AJAx Request to send the connection request to the MR connect admins.
+					// $('.modalText').html("<h3>Just a step more!<br /> Please let us know the reason you want to send the connection request to the concerned person. It'll help us in keeping things sorted.</h3>");
+					// $('.connModal').modal('show');
 
-					$('#btnSendConnRequest').on('click', function() {
+					// //write the AJAx Request to send the connection request to the MR connect admins.
 
-						var requestText = $('#connBody').val().trim();
+					// $('#btnSendConnRequest').on('click', function() {
 
-						if(requestText == "") {
-							popup.children('p').remove();
-							popup.fadeOut();
-							popup.append("<p>Please provide a small write-up for the request.</p>").fadeIn();
-						}
-						else {
-							alertMsg.children('p').remove();
-		    				alertMsg.append("<p>Sending Connection Request... Please wait</p>").fadeIn();
-							$.ajax({
-								type: "GET",
-								url: "AJAXFunctions.php",
-								data: {
-									no: "9", requestFrom: getCookie("userEmail"), requestForEmail: requestForEmail, requestForId: requestForId, requestText: requestText
-								},
-								success: function(response) {
-									alertMsg.children('p').remove();
-				                    alertMsg.fadeOut();
-									if(response == "1") {
-					                    popup.append("<p>Thank You for your Connection Request. Please check your inbox for more details.</p>").fadeIn();
+					// 	var requestText = $('#connBody').val().trim();
 
-					                    //hide the modal now.
-										$('.connModal').modal('show');					                    
-									}
-									else {
-										popup.append("<p>Sorry, but we encountered an error in Sending your connection Request. Please try again.</p>").fadeIn();
-									}
-								},
-								error: function() {
-									alert("Error in ajax. ");
-								}
-							});
-						}
+					// 	if(requestText == "") {
+					// 		popup.children('p').remove();
+					// 		popup.fadeOut();
+					// 		popup.append("<p>Please provide a small write-up for the request.</p>").fadeIn();
+					// 	}
+					// 	else {
+					// 		alertMsg.children('p').remove();
+		   //  				alertMsg.append("<p>Sending Connection Request... Please wait</p>").fadeIn();
+					// 		$.ajax({
+					// 			type: "GET",
+					// 			url: "AJAXFunctions.php",
+					// 			data: {
+					// 				no: "9", requestFrom: getCookie("userEmail"), requestForEmail: requestForEmail, requestForId: requestForId, requestText: requestText
+					// 			},
+					// 			success: function(response) {
+					// 				alertMsg.children('p').remove();
+				 //                    alertMsg.fadeOut();
+					// 				if(response == "1") {
+					//                     popup.append("<p>Thank You for your Connection Request. Please check your inbox for more details.</p>").fadeIn();
 
-						return false;
-					});
+					//                     //hide the modal now.
+					// 					$('.connModal').modal('show');					                    
+					// 				}
+					// 				else {
+					// 					popup.append("<p>Sorry, but we encountered an error in Sending your connection Request. Please try again.</p>").fadeIn();
+					// 				}
+					// 			},
+					// 			error: function() {
+					// 				alert("Error in ajax. ");
+					// 			}
+					// 		});
+					// 	}
+
+					// 	return false;
+					// });
 
 					return false;
 				});
@@ -467,9 +668,15 @@
 								alert("Sorry, no results found!");
 							}
 							else {
-								$('.searchList').append(response);
+								// $('.searchList').append(response);
+								// alertMsg.children('p').remove();
+								// alertMsg.fadeOut();
+
+								var results = getUsers(response, 10);
+								$('.searchList').append(results);
 								alertMsg.children('p').remove();
-								alertMsg.fadeOut();
+								alertMsg.fadeOut();								
+
 							}	
 						},
 						error: function(response) {
@@ -548,6 +755,134 @@
 					return false;
 				});
 
+				
+				// to populate the poll area on RHS.
+				populatePollArea();
+
+				// this is for the voting button that comes from AJAX.
+				$('.pollList').delegate('.btnVote', 'click', function() {
+					var poll = $('.pQuestion');
+					var checked = "";
+					var checkedName = "";
+
+					$.each(poll, function() {
+						if($(this).is(':checked')) {
+							checked = $(this).attr('data-id');
+							checkedName = $(this).attr('data-name');
+						}
+					});  
+
+					// now, make ajax request to increase the number of votes.
+					alertMsg.children('p').remove();
+					alertMsg.append("<p>Please wait while we record your Vote. Please wait...</p>").fadeIn();
+					$.ajax({
+						type: "GET",
+						url: "AJAXFunctions.php",
+						data: {
+							no: "12", id: getCookie("userID"), email: getCookie("userEmail"), checked: checked, checkedName: checkedName
+						},
+						success: function(response) {
+							alertMsg.children('p').remove();
+							alertMsg.fadeOut();
+							if(response == "1") {
+								popup.children('p').remove();
+								popup.append("<p>Your Response has been recorded. Thank You.</p>").fadeIn();
+
+								// now, here is the space for showing the current number of votes.
+								getPollResults();
+							}
+							else if(response == "-2") {
+								popup.children('p').remove();
+								popup.append("<p>Oops! We encountered an error. Please try again.</p>").fadeIn();								
+							}
+							else if(response == "-3") {
+								popup.children('p').remove();
+								popup.append("<p>Oops! We encountered an error. Please try again.</p>").fadeIn();								
+							}
+							else if(response == "-4") {
+								popup.children('p').remove();
+								popup.append("<p>You have already casted your vote. Please wait for the results.</p>").fadeIn();								
+							}
+							else {
+								popup.children('p').remove();
+								popup.append("<p>Oops! We encountered an error. Please try again.</p>").fadeIn();								
+							}
+						},
+						error: function() {
+							alert("Error in ajax function.");
+						}
+					});
+					return false;
+				});
+
+				// this is to submit the questio asked according to categories.
+				$('#btnAskQuestion').on('click', function() {
+
+					var category = $('#ddlCategories').val();
+					var question = $('#askQuestion').val();
+
+					if(category == "0") {
+						popup.children('p').remove();
+						popup.append("<p>Please select the Question category before submitting.<p>").fadeIn();
+					}
+					else if(question == "") {
+						popup.children('p').remove();
+						popup.append("<p>Please put in some question before submitting.<p>").fadeIn();	
+					}
+					else {
+
+						// put in the ajax to save the question to the database.
+						alertMsg.children('p').remove();
+						alertMsg.append("<p>Please wait while we submit your Question to our Experts Team...</p>").fadeIn();
+						$.ajax({
+							type: "GET",
+							url: "AJAXFunctions.php",
+							data: {
+								no: "15", id: getCookie("userID"), email: getCookie("userEmail"), category: category, question: question
+							},
+							success: function(response) {
+								alertMsg.children('p').remove();
+								if(response == "1") {
+									popup.children('p').remove();
+									popup.append("<p>Your question has been recorded. Thank You.</p>").fadeIn();
+								}
+								else if(reponse == "-1") {
+									popup.children('p').remove();
+									popup.append("<p>Oops! We encountered an error recording your question. Please try again.</p>").fadeIn();
+								}
+								else {
+									popup.children('p').remove();
+									popup.append("<p>Oops! We encountered an error recording your question. Please try again.</p>").fadeIn();	
+								}
+							},
+							error: function() {
+								popup.children('p').remove();
+								popup.append("<p>Oops! We encountered an error recording your question. Please try again.</p>").fadeIn();
+							}
+						});
+
+					}
+
+					return false;
+				});
+
+				// this is for the poll List item that shows the poll Questions div on clicking.
+				$('#pollQuesList').on('click', function() {
+					changeActiveState(this);
+					showDiv(pollQuestionDiv);
+					pollQuestionDiv.removeClass('hidden-xs hidden-sm');
+					return false;
+				});
+
+				// this is for the see more button to show more records.
+				$('.allList, .searchList').delegate('.btnSeeMore', 'click', function() {
+					var no = $(this).attr('data-number');
+					no = Number(no);
+					alert(no);
+					populateUserData(no + 10);
+					return false;
+				});
+
     		});
     	</script>
 
@@ -580,7 +915,7 @@
 		</h1>
 
 		<!-- for the list group on the LHS -->
-		<div class="col-lg-2 col-md-2 col-sm-2 navDiv">
+		<div class="col-lg-2 col-md-2 col-sm-3 navDiv">
 			<div class="list-group">
 				<a href="#" class="list-group-item ourNetwork">Our Network</a>
 				<a href="#" class="list-group-item search">Search Network</a>
@@ -597,20 +932,51 @@
 				<a href="http://mentored-research.com" class="list-group-item MRMainPage">Equity Research Initiative</a>
 				<a href="http://mentored-research.com/theCompendium.php" class="list-group-item compendium">The Compendium</a>
 			</div>
-		</div>
 
-		<div class="col-lg-10 col-md-10 col-sm-10 mainContent">
-			
-			<div class="ourNetworkDiv divsMain">
-				<div class="allList">
-				
+			<!-- This is only for the tablets and the phone devices. -->
+			<div class="list-group">
+				<a href="#pollQuestion" id="pollQuesList" class="list-group-item hidden-lg hidden-md scrolly">Poll Questions</a>
+			</div>
+
+			<div class="list-group" id="askQuesDiv" >
+				<a href="#askQuesDiv" style="background-color: #428bca; color: white;" class="list-group-item scrolly">Ask a Question</a>				
+
+				<div class="list-group-item askQuestionDiv" >
+					
+					<select class="form-control" id="ddlCategories">
+						<option value="0">
+							-- Select Category --
+						</option>
+						<option value="1">
+							G.M.A.T.
+						</option>
+						<option value="2">
+							C.A.T./X.A.T.
+						</option>
+						<option value="3">
+							F.R.M.
+						</option>
+					</select>
+
+					<textarea id="askQuestion" class="form-control" rows="10" placeholder="Ask a Question pertaining to the selected Category"></textarea>
+
+					<button id="btnAskQuestion" class="btn btn-lg btn-primary btn-block">
+						Submit
+					</button>
 				</div>
 			</div>
 
-			<div class="searchDiv divsMain">
-				<!-- <h1 class="text-center searchHeader">
-					Search MR - Connect
-				</h1> -->
+		</div>
+
+		<div class="col-lg-10 col-md-10 col-sm-9 mainContent">
+			
+			<div class="ourNetworkDiv divsMain">
+				<div class="col-lg-9 col-md-9 allList">
+
+				</div>
+			</div>
+
+			<div class="col-lg-9 col-md-9 searchDiv divsMain">
 				<div>
 					<input type="text" id="txtSearch" class="form-control searchBox" placeholder="Enter Search Name" />
 
@@ -654,9 +1020,22 @@
 
 				</div>
 
+			</div>   <!-- end of searchDiv -->
+
+			<!-- This is for the Polling Question thing on the RHS. -->
+			<div id="pollQuestion" class="col-lg-3 col-md-3 hidden-xs hidden-sm poll">
+
+				<div class="list-group pollList">
+					<a href="#" class="list-group-item active">
+						Please wait for the Webinar you'd like to attend in the near future.
+					</a>
+				</div>
+
 			</div>
-		</div>
-	</div>  <!-- ./MainWrapper -->
+
+		</div>   <!-- end of mainContent Div -->
+
+	</div>     <!-- ./MainWrapper -->
 
 
 	<footer class="col-md-12 col-lg-12 col-sm-12 col-xs-12">

@@ -6,6 +6,184 @@
 	//these are for the PHP Helper files
 	include 'headers/databaseConn.php';
 
+	// this is to submit the question to database based on category
+	function SubmitAskedQuestions($id, $email, $category, $question, $date) {
+		global $connection;
+		$response = "-1";
+		try {
+			$query = "insert into AskQuestions(UserID, QuesCategory, QuestionAsked, UpdatedOn) values('$id', '$category', '$question', '$date')";
+			$rs = mysql_query($query);
+			if(!$rs) {
+				$response = "-1";
+			}
+			else {
+				$response = "1";
+			}
+			return $response;
+		}
+		catch(Exception $e) {
+			$response = "-1";
+			return $response;
+		}
+	}
+
+	// this is to get the count of all the votes in a question
+	function GetVoteCountPollQuestions() {
+		global $connection;
+		$response = "-1";
+		try {
+			$query = "select * from PollQuestions";
+			$rs = mysql_query($query);
+			if(!$rs) {
+				$response = "-1";
+			}
+			else {
+				$response = "";
+				while ($res = mysql_fetch_array($rs)) {
+					$response .= $res["Question"] . " -> " . $res["Votes"] . " && ";
+				}
+			}
+			return $response;
+		}
+		catch(Exception $e) {
+			$response = "-1";
+			return $response;
+		}
+	}
+
+	// this is the helper function to increase the number of votes for a particualr pll question.
+	function IncreaseVotes($checked, $checkedName) {
+		global $connection;
+		$response = "-1";
+
+		$newVotes = 0;
+
+		$votesNo = GetVotesNumber($checked, $checkedName);
+		if($votesNo == -1) {
+			$response = "-1";
+			return $response;
+		}
+		else {
+			$newVotes = $votesNo + 1;
+		}
+
+		try {
+			$query = "update PollQuestions set Votes='$newVotes' where PollID='$checked' and Question='$checkedName'";
+			$rs = mysql_query($query);
+			if(!$rs) {
+				$response = "-1";
+			}
+			else {
+				$response = "1";
+			}
+			return $response;
+		}
+		catch(Exception $e) {
+			$response = "-1";
+			return $response;
+		}
+	}
+
+	// this is the heler function to get the number of votes that a poll question already has.
+	function GetVotesNumber($checked, $checkedName) {
+		global $connection;
+		$response = 0;
+		try {
+			$query = "select * from PollQuestions where PollID='$checked' and Question='$checkedName'";
+			$rs = mysql_query($query);
+			if(!$rs) {
+				$response = -1;
+			}
+			else {
+				while ($res = mysql_fetch_array($rs)) {
+					$response = $res["Votes"];
+				}
+			}
+			return $response;
+		}
+		catch(Exception $e) {
+			$response = -1;
+			return $response;
+		}
+	}
+
+	// this is the helper function to change the voted Status for a user. 0 for not voted and 1 for voted.
+	function SetVotedStatusOfUser($email, $id, $newVal) {
+		global $connection;
+		$response = "-1";
+		try {
+			$query = "update Users set IsVoted='$newVal' where UserEmail='$email'";
+			$rs = mysql_query($query);
+			if(!$rs) {
+				$response = "-1";
+			}
+			else {
+				$response = "1";
+			}
+			return $response;
+		}		
+		catch(Exception $e) {
+			$response = "-1";
+			return $response;
+		}
+	}
+
+	// this is the helper function to check if the user has already voted or not.
+	// Returns 1 if the user has voted. Otherwise, 0. -1 on Error.
+	function IsVoted($email, $id) {
+		global $connection;
+		$response = "-1";
+		try {
+			$query = "select * from Users where UserEmail='$email'";
+			$rs = mysql_query($query);
+			if(!$rs) {
+				$response = "-1";
+			}
+			else {
+				while ($res = mysql_fetch_array($rs)) {
+					if($res["IsVoted"] == 1) {
+						$response = "1";
+					}
+					else if($res["IsVoted"] == 0) {
+						$response = "0";
+					}
+					else {
+						$response = "-1";
+					}
+				}
+			}
+			return $response;
+		}		
+		catch(Exception $e) {
+			$response = "-1";
+			return $response;
+		}
+	}
+
+	// this is the function to get all the poll questions from the database.
+	function GetPollQuestionsRadioList() {
+		global $connection;
+		$response = "<div class='list-group-item'><table class='table table-responsive'>";
+		try {
+			$query = "select * from PollQuestions";
+			$rs = mysql_query($query);
+			if(!$rs) {
+				$response = "-1";
+			}
+			else {
+				while($res = mysql_fetch_array($rs)) {
+					$response .= "<tr><td><input type='radio' name='pollQues' class='pQuestion' id='pollQuestion" . $res["PollID"] . "' data-id='" . $res["PollID"] . "' data-name='" . $res["Question"] . "' /></td><td> <label for='pollQuestion" . $res["PollID"] . "'>" . $res["Question"] . "</label>  </td></tr>";
+				}
+			}
+			$response .= "</table><button id='btnPollVote' class='btn btn-lg btn-primary btn-block btnVote'>Vote Now</button></div>";
+			return $response;
+		}
+		catch(Exception $e) {
+			$response = "-1";
+			return $response;
+		}
+	}
+
 	//this is the function to send the mail to the user who requested the connection, as a confirmation.
 	function SendConfirmationOfRequest($requestFrom, $requestFromName, $requestForEmail, $requestForName) {
 		$res = "";
@@ -87,7 +265,7 @@
 						}
 					}  
 					$interests = substr($interests, 0, strlen($interests) - 2);
-					$response .= "<div class='list-group-item item'><img src='" . $res["UserPic"] . "' class='userImage' width='170' height='170' /><div class='userItem'><p class='userName'>" . $res["UserName"] . "</p><p class='userLocation'> <span>Currently at: </span> <u>" . $res["UserLocation"] . "</u> <br /> <span>Expertise in: </span> <u>" . $interests . "</u> </p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div></div>";				
+					$response .= "<div class='list-group-item item'><img src='" . $res["UserPic"] . "' class='userImage' width='120' height='120' /><div class='userItem'><p class='userName'>" . $res["UserName"] . "</p><p class='userLocation'> <span>Currently at: </span> <u>" . $res["UserLocation"] . "</u> <br /> <span>Expertise in: </span> <u>" . $interests . "</u> </p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div></div>";				
 				}
 			}
 			return $response;
@@ -157,7 +335,7 @@
 					$in = explode(" @I ", $interests);
 					$interests = "";
 					foreach ($in as $i) {
-						if($i == "-" || $i == " " || $i == "") {
+						if($i == "-" || $i == " " || $i == "" || $i == "-3") {
 
 						}
 						else {
@@ -165,8 +343,23 @@
 						}
 					}  
 					$interests = substr($interests, 0, strlen($interests) - 2);
-					// <span>Currently at: </span> <u>" . $res["UserLocation"] . "</u> <br />
-					$response .= "<div class='list-group-item item'><img src='" . $res["UserPic"] . "' class='userImage' width='170' height='170' /><div class='userItem'><p class='userName'>" . $res["UserName"] . "</p><p class='userLocation'> <span>Expertise in: </span> <u>" . $interests . "</u> </p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div><button class='btn btn-lg btn-primary btn-block btnConnRequest' data-id='" . $id . "' data-email='" . $email . "'>Send a Connection Request</button></div>";
+
+					if($interests == "") {
+						$interests = "-1";
+					}
+
+					if($res["UserPic"] == "") {
+						$res["UserPic"] = "img/dp.jpg";
+					}
+
+					if($interests == "-1") {
+						$response .= "<div class='list-group-item item'><div class='media-left media-top'><img src='" . $res["UserPic"] . "' class='media-object userImage' width='120' height='120' /></div><div class='userItem'><p class='userName'>" . $res["UserName"] . "</p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div><button class='btn btn-lg btn-primary btn-block btnConnRequest' data-id='" . $id . "' data-email='" . $email . "' data-profile='" . $res["UserProfile"] . "'>Connect on LinkedIn</button></div>" . " (BR) ";
+					}
+					else {
+						$response .= "<div class='list-group-item item'><div class='media-left media-top'><img src='" . $res["UserPic"] . "' class='media-object userImage' width='120' height='120' /></div><div class='userItem'><p class='userName'>" . $res["UserName"] . "</p><p class='userLocation'><span>Expertise in: </span> <u>" . $interests . "</u> </p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div><button class='btn btn-lg btn-primary btn-block btnConnRequest' data-id='" . $id . "' data-email='" . $email . "' data-profile='" . $res["UserProfile"] . "'>Connect on LinkedIn</button></div>"  . " (BR) ";
+					}
+
+					//$response .= "<div class='list-group-item item'><img src='" . $res["UserPic"] . "' class='userImage' width='120' height='120' /><div class='userItem'><p class='userName'>" . $res["UserName"] . "</p><p class='userLocation'> <span>Expertise in: </span> <u>" . $interests . "</u> </p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div><button class='btn btn-lg btn-primary btn-block btnConnRequest' data-id='" . $id . "' data-email='" . $email . "' data-profile='" . $res["UserProfile"] . "'>Connect on LinkedIn</button></div>";
 				}
 			}
 			$response .= "</div>";
@@ -178,10 +371,10 @@
 		}
 	}
 
-	//this is the function to get all the users in the list format for showing.
+	// this is to get all the users in the list as thumbnails. Just a try thing.
 	function GetAllUsersList() {
 		global $connection;
-		$response = "<div class='list-group'>";
+		$response = "<div class='thumbnailList'><div class='row'>";
 		$id = "";
 		$email = "";
 		$interests = "";
@@ -208,15 +401,24 @@
 						}
 					}  
 					$interests = substr($interests, 0, strlen($interests) - 2);
+
 					if($interests == "") {
-						$interests = "None defined";
+						$interests = "-1";
 					}
 
 					if($res["UserPic"] == "") {
 						$res["UserPic"] = "img/dp.jpg";
 					}
-					// <span>Currently at: </span> <u>" . $res["UserLocation"] . "</u> <br />
-					$response .= "<div class='list-group-item item'><img src='" . $res["UserPic"] . "' class='userImage' width='170' height='170' /><div class='userItem'><p class='userName'>" . $res["UserName"] . "</p><p class='userLocation'><span>Expertise in: </span> <u>" . $interests . "</u> </p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div><button class='btn btn-lg btn-primary btn-block btnConnRequest' data-id='" . $id . "' data-email='" . $email . "'>Send a Connection Request</button></div>";
+
+					// <p class='userLocation'><span>Expertise in: </span> <u>" . $interests . "</u> </p>
+					if($interests == "-1") {
+						//$response .= "<div class='list-group-item item'><div class='media-left media-top'><img src='" . $res["UserPic"] . "' class='media-object userImage' width='120' height='120' /></div><div class='userItem'><p class='userName'>" . $res["UserName"] . "</p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div><button class='btn btn-lg btn-primary btn-block btnConnRequest' data-id='" . $id . "' data-email='" . $email . "' data-profile='" . $res["UserProfile"] . "'>Connect on LinkedIn</button></div>" . " (BR) ";
+						$response .= "<div class='col-lg-6 col-md-6'><div class='thumbnail'><img class='media-object userImage' width='130' height='130' src='" . $res["UserPic"] . "' /><div class='caption'><p class='userName'>" . $res["UserName"] . "</p><p class='userLocation'><span>Expertise in: </span> <u>" . "None" . "</u> </p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div></div></div>" . " (BR) ";
+					}
+					else {
+						//$response .= "<div class='list-group-item item'><div class='media-left media-top'><img src='" . $res["UserPic"] . "' class='media-object userImage' width='120' height='120' /></div><div class='userItem'><p class='userName'>" . $res["UserName"] . "</p><p class='userLocation'><span>Expertise in: </span> <u>" . $interests . "</u> </p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div><button class='btn btn-lg btn-primary btn-block btnConnRequest' data-id='" . $id . "' data-email='" . $email . "' data-profile='" . $res["UserProfile"] . "'>Connect on LinkedIn</button></div>"  . " (BR) ";
+						$response .= "<div class='col-lg-6 col-md-6'><div class='thumbnail'><img class='media-object userImage' width='130' height='130' src='" . $res["UserPic"] . "' /><div class='caption'><p class='userName'>" . $res["UserName"] . "</p><p class='userLocation'><span>Expertise in: </span> <u>" . $interests . "</u> </p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div></div></div>" . " (BR) ";
+					}
 				}
 			}
 			$response .= "</div>";
@@ -227,6 +429,63 @@
 			return $response;
 		}
 	}
+
+	//this is the function to get all the users in the list format for showing.
+	// function GetAllUsersList() {
+	// 	global $connection;
+	// 	$response = "<div class='list-group'>";
+	// 	$id = "";
+	// 	$email = "";
+	// 	$interests = "";
+	// 	try {
+	// 		$query = "select * from Users";
+	// 		$rs = mysql_query($query);
+	// 		if(!$rs) {
+	// 			$response = "-1";
+	// 		}
+	// 		else {
+	// 			while ($res = mysql_fetch_array($rs)) {
+	// 				$id = $res["UserID"];
+	// 				$email = $res["UserEmail"];
+
+	// 				$interests = getInterests($email, $id);
+	// 				$in = explode(" @I ", $interests);
+	// 				$interests = "";
+	// 				foreach ($in as $i) {
+	// 					if($i == "-" || $i == " " || $i == "" || $i == "-3") {
+
+	// 					}
+	// 					else {
+	// 						$interests .= $i . ", ";
+	// 					}
+	// 				}  
+	// 				$interests = substr($interests, 0, strlen($interests) - 2);
+
+	// 				if($interests == "") {
+	// 					$interests = "-1";
+	// 				}
+
+	// 				if($res["UserPic"] == "") {
+	// 					$res["UserPic"] = "img/dp.jpg";
+	// 				}
+
+	// 				// <p class='userLocation'><span>Expertise in: </span> <u>" . $interests . "</u> </p>
+	// 				if($interests == "-1") {
+	// 					$response .= "<div class='list-group-item item'><div class='media-left media-top'><img src='" . $res["UserPic"] . "' class='media-object userImage' width='120' height='120' /></div><div class='userItem'><p class='userName'>" . $res["UserName"] . "</p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div><button class='btn btn-lg btn-primary btn-block btnConnRequest' data-id='" . $id . "' data-email='" . $email . "' data-profile='" . $res["UserProfile"] . "'>Connect on LinkedIn</button></div>" . " (BR) ";
+	// 				}
+	// 				else {
+	// 					$response .= "<div class='list-group-item item'><div class='media-left media-top'><img src='" . $res["UserPic"] . "' class='media-object userImage' width='120' height='120' /></div><div class='userItem'><p class='userName'>" . $res["UserName"] . "</p><p class='userLocation'><span>Expertise in: </span> <u>" . $interests . "</u> </p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div><button class='btn btn-lg btn-primary btn-block btnConnRequest' data-id='" . $id . "' data-email='" . $email . "' data-profile='" . $res["UserProfile"] . "'>Connect on LinkedIn</button></div>"  . " (BR) ";
+	// 				}
+	// 			}
+	// 		}
+	// 		$response .= "</div>";
+	// 		return $response;
+	// 	}
+	// 	catch(Exception $e) {
+	// 		$response = "-1";
+	// 		return $response;
+	// 	}
+	// }
 
 	//this is the function to update the data into the interests table.
 	function UpdateInterests($id, $email, $i1, $i2, $i3, $i4, $i5, $i6, $i7, $date) {
@@ -465,5 +724,18 @@
 		catch(Exception $e) {
 			return "-1";
 		}
+	}
+
+	// this is the helper function to save the details to the log file.
+	function WriteToLog($txt) {
+		$logFile = fopen("log/log.txt", "a");
+		if(!$logFile) {
+			die("Cannot write to log.");
+		}
+		else {
+			$date = date("Y-m-d H:i:s");
+			fwrite($logFile, $date . " --> " . $txt . "\n");
+		}
+		fclose($logFile);
 	}
 ?>
