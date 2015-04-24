@@ -125,6 +125,7 @@
 	    	#exSearch {
 	    		margin-top: 2%;
 	    		margin-bottom: 2%;
+	    		font-family: boldText;
 	    	}
 
 	    	.advSearch {
@@ -461,12 +462,44 @@
     			$('.ourNetwork').on('click', function() {
     				changeActiveState(this);
     				showDiv(ourNetworkDiv);
+
+    				var finalNetworkLink = $('#finalNetworkLink');
+    				// finalNetworkLink.trigger('click');
+
+    				if ($(window).width() >= 1200) {
+				    } 
+				    else if ($(window).width() >= 992) {
+				    } 
+				    else if ($(window).width() >= 768) {
+				    } 
+				     else if ($(window).width() >= 480) {
+				        finalNetworkLink.trigger('click');
+				    } 
+				    else {
+				        finalNetworkLink.trigger('click');
+				    }
     				return false;
     			});
 
     			$('.search').on('click', function() {
     				changeActiveState(this);
     				showDiv(searchDiv);
+    				
+    				var finalSearchLink = $('#finalSearchLink');
+
+    				if ($(window).width() >= 1200) {
+				    } 
+				    else if ($(window).width() >= 992) {
+				    } 
+				    else if ($(window).width() >= 768) {
+				    } 
+				     else if ($(window).width() >= 480) {
+				        finalSearchLink.trigger('click');
+				    } 
+				    else {
+				        finalSearchLink.trigger('click');
+				    }
+
     				return false;
     			});
 
@@ -903,6 +936,7 @@
 							},
 							success: function(response) {
 								alertMsg.children('p').remove();
+								alertMsg.fadeOut();
 								if(response == "1") {
 									popup.children('p').remove();
 									popup.append("<p>Your question has been recorded. Thank You.</p>").fadeIn();
@@ -979,8 +1013,8 @@
 		<!-- for the list group on the LHS -->
 		<div class="col-lg-2 col-md-2 col-sm-3 navDiv">
 			<div class="list-group">
-				<a href="#" class="list-group-item ourNetwork">Our Network</a>
-				<a href="#" class="list-group-item search">Search Network</a>
+				<a href="#" class="list-group-item ourNetwork scrolly">Our Network</a>
+				<a href="#" class="list-group-item search scrolly">Search Network</a>
 			</div>
 
 			<div class="list-group">
@@ -1031,19 +1065,23 @@
 
 		</div>
 
-		<div class="col-lg-10 col-md-10 col-sm-9 mainContent">
-			
-			<div class="ourNetworkDiv divsMain">
+		<a href="#finalNetwork" id="finalNetworkLink" style="display: none;" class="hidden-lg hidden-md scrolly" ></a>
+		<a href="#finalSearch" id="finalSearchLink" style="display: none;" class="hidden-lg hidden-md scrolly" ></a>
+
+		<div class="col-lg-10 col-md-10 col-sm-9 mainContent" id="finalNetwork">
+
+			<div class="ourNetworkDiv divsMain" >
+
 				<div class="col-lg-9 col-md-9 allList">
 
 				</div>
 			</div>
 
-			<div class="col-lg-9 col-md-9 searchDiv divsMain">
-				<div>
-					<input type="text" id="txtSearch" class="form-control searchBox" placeholder="Enter Search Name/Email Address" />
+			<div class="col-lg-9 col-md-9 searchDiv divsMain" id="finalSearch">
 
-					<!-- <a href="#" id="exSearch" style="float:right;">Advanced Search</a> -->
+				<!-- <div> -->
+				<div class="row">
+					<input type="text" id="txtSearch" class="form-control searchBox" placeholder="Enter Search Name/Email Address" />
 
 					<button id="btnSearch" class="btn btn-lg btn-primary searchBtn">
 						Search MR - Connect
@@ -1052,6 +1090,7 @@
 					<button id="exSearch" class="btn btn-lg btn-primary" style="float:right;">
 						Advanced Search
 					</button>
+				</div>
 
 					<div class="advSearch">
 						<!-- <div class="list-group interest">
@@ -1123,7 +1162,7 @@
                 			Search by Expertise
                 		</button>
 					</div>
-				</div>
+				<!-- </div> -->
 
 				<!-- this is for the list of the searched contacts -->
 				<div class="searchList">
