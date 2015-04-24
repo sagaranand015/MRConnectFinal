@@ -118,7 +118,12 @@
 	    	.searchBtn {
 	    		font-family: boldText;
 	    		margin-top: 2%;
-	    		margin-left: 38%;
+	    		/*margin-left: 38%;*/
+	    		margin-bottom: 2%;
+	    	}
+
+	    	#exSearch {
+	    		margin-top: 2%;
 	    		margin-bottom: 2%;
 	    	}
 
@@ -190,6 +195,11 @@
 			.btnSeeMore {
 				margin: 3% 0 0 0%;
 			}
+
+			.lblAdvSearch {
+				font-family: boldText;
+				font-size: 1.2em;
+			}
      	</style>
 
     	<script type="text/javascript">
@@ -197,6 +207,7 @@
 		// this is the function to get the See More button in the markup.
 		function getSeeMoreButton(n) {
 			$('.btnSeeMore').remove();
+			var btnMarkup = "";
 
 			n = Number(n);
 			if(n == 10) {
@@ -206,7 +217,7 @@
 				n += 10;
 			}
 
-			var btnMarkup = "<button class='btn btn-lg btn-primary btn-block btnSeeMore' data-number='" + n + "'>See More Records</button>";
+			btnMarkup = "<button class='btn btn-lg btn-primary btn-block btnSeeMore' data-number='" + n + "'>See More Records</button>";
 			return btnMarkup;
 		}
 
@@ -214,16 +225,49 @@
 		function getUsers(response, n) {
 			var users = response.split(" (BR) ");
 			var res = "";
+			var seeMore = "";
 
-			for(var i=0;i<n;i++) {
-				if(users[i] == undefined) {
+			var counter = 0;
+			var en = true;
 
-				}
-				else {
-					res += users[i];
+			n = Number(n);
+			if(n == 10) {
+				for(var i=0;i<10;i++) {
+					if(users[i] == undefined) {
+						counter++;
+					}
+					else {
+						res += users[i];
+					}
 				}
 			}
-			var seeMore = getSeeMoreButton(n);
+			else if(n%10 == 0) {
+				res = "<div class='row'>";
+				for(var i=n-10;i<=n;i++) {
+					if(users[i] == undefined) {
+						counter++;
+					}	
+					else {
+						res += users[i];
+					}
+				}
+				res += "</div>";
+			}
+			else {
+				//alert("Please try again.Y0011");
+				res = "<div class='row'>";
+				for(var i=n-10;i<=n;i++) {
+					if(users[i] == undefined) {
+						counter++;
+					}	
+					else {
+						res += users[i];
+					}
+				}
+				res += "</div>";
+			}
+
+			seeMore = getSeeMoreButton(n);
 			return res + seeMore;
 		}
 
@@ -240,9 +284,9 @@
 			});
 
 			//this is to get all the users from the database and show it in the list format.
-			$('.allList').children('div.list-group-item').remove();
-			$('.allList').children('div.list-group').remove();
-			$('.allList').children('.btn').remove();
+			// $('.allList').children('div.list-group-item').remove();
+			// $('.allList').children('div.list-group').remove();
+			// $('.allList').children('.btn').remove();
 			alertMsg.children('p').remove();
 			alertMsg.append("<p>Building the MR - Network... Please wait</p>").fadeIn();
 			$.ajax({
@@ -258,6 +302,7 @@
 					else {
 						var users = getUsers(response, noRecords);
 						$('.allList').append(users);
+						$('.allList').fadeIn(1000);
 
 						// for the popus and notifications.
 						alertMsg.children('p').remove();
@@ -650,39 +695,47 @@
 
 					//for the search button thing!
 					var searchTerm = $('#txtSearch').val();
-					$('.searchList').children('div').remove();
+					$('.advSearch').slideUp();
 
-					//to remove the older results.
-					$('.searchList').children('div').remove();
+					if(searchTerm == "") {
+						popup.children('p').remove();
+						popup.append("<p>Please enter a name/Email Address for the search to be complete.</p>").fadeIn();
+					}
+					else {
+						$('.searchList').children('div').remove();
 
-					alertMsg.children('p').remove();
-					alertMsg.append("<p>Getting Search Results... Please wait</p>").fadeIn();
-					$.ajax({
-						type: "GET",
-						url: "AJAXFunctions.php",
-						data: {
-							no: "7", searchKey: searchTerm
-						},
-						success: function(response) {
-							if(response == "-1") {
-								alert("Sorry, no results found!");
+						//to remove the older results.
+						$('.searchList').children('div').remove();
+
+						alertMsg.children('p').remove();
+						alertMsg.append("<p>Getting Search Results... Please wait</p>").fadeIn();
+						$.ajax({
+							type: "GET",
+							url: "AJAXFunctions.php",
+							data: {
+								no: "7", searchKey: searchTerm
+							},
+							success: function(response) {
+								if(response == "-1") {
+									alert("Sorry, no results found!");
+								}
+								else {
+									$('.searchList').append(response);
+									alertMsg.children('p').remove();
+									alertMsg.fadeOut();
+
+									// var results = getUsers(response, 10);
+									// $('.searchList').append(results);
+									// alertMsg.children('p').remove();
+									// alertMsg.fadeOut();								
+
+								}	
+							},
+							error: function(response) {
+								alert("Error in searching. " + response);
 							}
-							else {
-								// $('.searchList').append(response);
-								// alertMsg.children('p').remove();
-								// alertMsg.fadeOut();
-
-								var results = getUsers(response, 10);
-								$('.searchList').append(results);
-								alertMsg.children('p').remove();
-								alertMsg.fadeOut();								
-
-							}	
-						},
-						error: function(response) {
-							alert("Error in searching. " + response);
-						}
-					});
+						});
+					}
 
 					return false;
 				});
@@ -696,6 +749,8 @@
 
 				$('#btnAdvSearch').on('click', function() {
 					
+					//$('#txtCustomIntArea').val("");
+
 					var i1 = "", i2 = "", i3 = "", i4 = "", i5 = "", i6 = "", i7 = "";
 					if ($('#txtGmatIntArea').parent('a').hasClass('list-group-item-success')) {
 						i1 = "G.M.A.T.";
@@ -721,9 +776,12 @@
 					if ($('#txtFrmIntArea').parent('a').hasClass('list-group-item-success')) {
 						i6 = "F.R.M.";
 					}
-					if ($('#txtCustomIntArea').parent('a').hasClass('list-group-item-success')) {
-						i7 = $('#txtCustomIntArea').val();
-					}
+					// if ($('#txtCustomIntArea').parent('a').hasClass('list-group-item-success')) {
+					// 	i7 = $('#txtCustomIntArea').val();
+					// }
+
+					// for the final custom search by School/Company
+					i7 = $('#txtCustomIntArea').val();
 
 					//to remove the previous results.
 					$('.searchList').children('div').remove();
@@ -743,6 +801,9 @@
 								alert("Sorry, no results found. Please try again.");
 							}
 							else {
+
+								$('#exSearch').trigger('click');
+
 								$('.searchList').append(response);
 								alertMsg.children('p').remove();
 								alertMsg.fadeOut();
@@ -871,6 +932,8 @@
 					changeActiveState(this);
 					showDiv(pollQuestionDiv);
 					pollQuestionDiv.removeClass('hidden-xs hidden-sm');
+					//$(this).trigger('click');
+					$('#pollHidden').trigger('click');
 					return false;
 				});
 
@@ -878,7 +941,6 @@
 				$('.allList, .searchList').delegate('.btnSeeMore', 'click', function() {
 					var no = $(this).attr('data-number');
 					no = Number(no);
-					alert(no);
 					populateUserData(no + 10);
 					return false;
 				});
@@ -935,7 +997,8 @@
 
 			<!-- This is only for the tablets and the phone devices. -->
 			<div class="list-group">
-				<a href="#pollQuestion" id="pollQuesList" class="list-group-item hidden-lg hidden-md scrolly">Poll Questions</a>
+				<a href="" id="pollQuesList" class="list-group-item hidden-lg hidden-md scrolly">Poll Questions</a>
+				<a href="#pollQuestion" id="pollHidden" class="scrolly" style="display: none;" />
 			</div>
 
 			<div class="list-group" id="askQuesDiv" >
@@ -978,16 +1041,20 @@
 
 			<div class="col-lg-9 col-md-9 searchDiv divsMain">
 				<div>
-					<input type="text" id="txtSearch" class="form-control searchBox" placeholder="Enter Search Name" />
+					<input type="text" id="txtSearch" class="form-control searchBox" placeholder="Enter Search Name/Email Address" />
 
-					<a href="#" id="exSearch" style="float:right;">Advanced Search</a>
+					<!-- <a href="#" id="exSearch" style="float:right;">Advanced Search</a> -->
 
 					<button id="btnSearch" class="btn btn-lg btn-primary searchBtn">
 						Search MR - Connect
 					</button>
 
+					<button id="exSearch" class="btn btn-lg btn-primary" style="float:right;">
+						Advanced Search
+					</button>
+
 					<div class="advSearch">
-						<div class="list-group interest">
+						<!-- <div class="list-group interest">
 		                    <a href="#" class="list-group-item" id="intArea1">
 		                        <h4 class="list-group-item-heading">G.M.A.T.</h4>
 		                        <input type="hidden" value="GMAT" id="txtGmatIntArea" />
@@ -1008,7 +1075,50 @@
 		                        <h4 class="list-group-item-heading">Search a school/Company/Institution</h4>
 		                        <input type="text" class="form-control" id="txtCustomIntArea" placeholder="Search a school/Company/Institution"  />
 		                    </a>
-                		</div>
+                		</div> -->
+
+                		<!-- Make the table for advanced Searching -->
+                		<table class="table table-striped">
+            				<tr>
+            					<td>
+        							<label class="lblAdvSearch">Search by Area Of Expertise: </label>
+            					</td>
+            					<td>
+            						<div class="list-group interest">
+					                    <a href="#" class="list-group-item" id="intArea1">
+					                        <h4 class="list-group-item-heading">G.M.A.T.</h4>
+					                        <input type="hidden" value="GMAT" id="txtGmatIntArea" />
+					                    </a>
+					                    <a href="#" class="list-group-item" id="intArea2">
+					                        <h4 class="list-group-item-heading">C.A.T./X.A.T.</h4>
+					                        <input type="hidden" value="CAT/XAT" id="txtCatIntArea" />
+					                    </a>
+					                    <a href="#" class="list-group-item" id="intArea5">
+					                        <h4 class="list-group-item-heading">C.F.A.</h4>
+					                        <input type="hidden" class="form-control" id="txtCfaIntArea"  />
+					                    </a>
+					                    <a href="#" class="list-group-item" id="intArea6">
+					                        <h4 class="list-group-item-heading">F.R.M.</h4>
+					                        <input type="hidden" class="form-control" id="txtFrmIntArea"  />
+					                    </a>
+					                    <!-- <a href="#" class="list-group-item" id="intArea7">
+					                        <h4 class="list-group-item-heading">Search a school/Company/Institution</h4>
+					                        <input type="text" class="form-control" id="txtCustomIntArea" placeholder="Search a school/Company/Institution"  />
+					                    </a> -->
+			                		</div>
+            					</td>
+            				</tr>
+            				<tr>
+            					<td>
+            						<label class="lblAdvSearch">Search by School/Company: </label>
+            					</td>
+            					<td>
+            						<input type="text" class="form-control" id="txtCustomIntArea" placeholder="Search a school/Company/Institution"  />
+            					</td>
+            				</tr>
+                		</table>
+
+
                 		<button id="btnAdvSearch" class="btn btn-lg btn-primary">
                 			Search by Expertise
                 		</button>
