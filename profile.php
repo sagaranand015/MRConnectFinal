@@ -263,34 +263,39 @@
 	        	//set the "id" cookie here.
 	        	// alertMsg.children('p').remove();
 	        	// alertMsg.append("<p>Getting profile info... Please wait</p>").fadeIn();
-				$.ajax({
-					type: "GET",
-					url: "AJAXFunctions.php/SetCookieID",
-					data: {
-						no: "6", email: getCookie("userEmail")
-					},
-					success: function(response) {
-						if(response == "-1") {
-							alert("Error. Please try again.");
-						}
-						else {
-							setCookie("userID", response, 150);
-						}
-					},
-					error: function(response) {
-						//alert("ERROR in setting ID Cookie.");
-					}
-				});
+				// $.ajax({
+				// 	type: "GET",
+				// 	url: "AJAXFunctions.php/SetCookieID",
+				// 	data: {
+				// 		no: "6", email: getCookie("userEmail")
+				// 	},
+				// 	success: function(response) {
+				// 		if(response == "-1") {
+				// 			alert("Error. Please try again.");
+				// 		}
+				// 		else {
+				// 			setCookie("userID", response, 150);
+				// 		}
+				// 	},
+				// 	error: function(response) {
+				// 		//alert("ERROR in setting ID Cookie.");
+				// 	}
+				// });
 
 				//check for queryStrings here.
         		if(qs["exist"] == "1") {    //if both the cookies exist. User exists in the database.
-        			IN.User.authorize(onlyAuthenticate);
+        			//IN.User.authorize(onlyAuthenticate);
+
+        			// this is without the linkedIn authorization Call.
+        			onlyAuthenticate();
         		}
         		else if(qs["exist"] == "-1") {
         			IN.User.authorize(linkedInAuth);	
         		}
         		else {
-        			IN.User.authorize(onlyAuthenticate);
+        			//IN.User.authorize(onlyAuthenticate);
+
+        			onlyAuthenticate();
         		} 
 	        }   //end of the onLinkedInLoad function!!
 
@@ -309,7 +314,7 @@
     			else if(response == "") {
     				alert("Could not retrieve the data from the database. Please try again.");
     			}
-    			else if(response == "-2") {
+    			else if(response == "-2") {    // this is when data does not exists in the database.
     				IN.User.authorize(linkedInAuth);
     			}
     			else {
@@ -599,6 +604,11 @@
 	                    else {
 	                    	jsonExp = JSON.stringify(memData.positions.values);
 	                    }
+
+	                    // save the Email Cookie here first.
+	                    var mail = memData.emailAddress;
+	                    console.log("This is saving the cookie in the profile when data comes from linkedin: " + mail);
+	                    setCookie("userEmail", mail, 150);
 
 	                    //all the data from the user's linkedin profile goes here into the AJAx call and then saved in to the database.
 

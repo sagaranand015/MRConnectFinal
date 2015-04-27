@@ -159,28 +159,32 @@
 				if(getCookie("userEmail") != "") {
 					//when both the cookies exists. Load data from database here, obviously after checking if data exists!
 
+					console.log("The Email Cookie already exists. Go ahead!");
+
+					console.log(getCookie("userEmail"));
+
 					alertMsg.children('p').remove();
 
 					//set the "id" cookie here.
 					alertMsg.append("<p>Logging you in... Please wait</p>").fadeIn();
-					$.ajax({
-						type: "GET",
-						url: "AJAXFunctions.php/SetCookieID",
-						data: {
-							no: "6", email: getCookie("userEmail")
-						},
-						success: function(response) {
-							if(response == "-1") {
-								alert("Error. Please try again.");
-							}
-							else {
-								setCookie("userID", response, 150);
-							}
-						},
-						error: function(response) {
-							//alert("ERROR in setting ID Cookie." + response.responseText);
-						}
-					});
+					// $.ajax({
+					// 	type: "GET",
+					// 	url: "AJAXFunctions.php/SetCookieID",
+					// 	data: {
+					// 		no: "6", email: getCookie("userEmail")
+					// 	},
+					// 	success: function(response) {
+					// 		if(response == "-1") {
+					// 			alert("Error. Please try again.");
+					// 		}
+					// 		else {
+					// 			setCookie("userID", response, 150);
+					// 		}
+					// 	},
+					// 	error: function(response) {
+					// 		//alert("ERROR in setting ID Cookie." + response.responseText);
+					// 	}
+					// });
 
 					//check if the user exists in the database. If yes, then go ahead. Otherwise, go to linkedIn function.
 					$.ajax({
@@ -193,7 +197,31 @@
 							alertMsg.children("p").remove();
 							alertMsg.fadeOut('fast');
 							if(response == "1") {
-								window.location.href = "profile.php?exist=1";	
+								//window.location.href = "profile.php?exist=1";	
+
+								//set the "id" cookie here.
+								alertMsg.append("<p>Logging you in... Please wait</p>").fadeIn();
+								$.ajax({
+									type: "GET",
+									url: "AJAXFunctions.php/SetCookieID",
+									data: {
+										no: "6", email: getCookie("userEmail")
+									},
+									success: function(response) {
+										if(response == "-1") {
+											alert("Error. Please try again.");
+										}
+										else {
+											setCookie("userID", response, 150);
+										}
+									},
+									error: function(response) {
+										//alert("ERROR in setting ID Cookie." + response.responseText);
+									}
+								});
+
+								// to go the network page bcoz the data already exists in the database.
+								window.location.href = "home.php?exist=1";	
 							}
 							else if(response == "-1") {
 								window.location.href = "profile.php?exist=-1";		
@@ -211,6 +239,7 @@
 					//No cookies exist. Load data from database if record exists. Otherwise from linkedin.
 					console.log("Cookies DOES NOT exist. " + getCookie("userEmail"));
 					IN.User.authorize(linkedInAuth);
+
 				}
 				else {
 					alert("Problem with the cookies and stuff!!");
@@ -228,30 +257,34 @@
 
                 	var memData = data.values[0];
 					var email = memData.emailAddress;
+					console.log(email);
 					setCookie("userEmail", email, 150);
 
 					alertMsg.children('p').remove();
 
 					//set the "id" cookie here.
 					alertMsg.append("<p>Logging you in... Please wait</p>").fadeIn('fast');
-					$.ajax({
-						type: "GET",
-						url: "AJAXFunctions.php",
-						data: {
-							no: "6", email: getCookie("userEmail")
-						},
-						success: function(response) {
-							if(response == "-1") {
-								alert("Error. Please try again.");
-							}
-							else {
-								setCookie("userID", response, 150);
-							}
-						},
-						error: function(response) {
-							alert("ERROR in setting ID Cookie." + response.responseText);
-						}
-					});
+
+					// should not be here.
+
+					// $.ajax({
+					// 	type: "GET",
+					// 	url: "AJAXFunctions.php",
+					// 	data: {
+					// 		no: "6", email: getCookie("userEmail")
+					// 	},
+					// 	success: function(response) {
+					// 		if(response == "-1") {
+					// 			alert("Error. Please try again.");
+					// 		}
+					// 		else {
+					// 			setCookie("userID", response, 150);
+					// 		}
+					// 	},
+					// 	error: function(response) {
+					// 		alert("ERROR in setting ID Cookie." + response.responseText);
+					// 	}
+					// });
 
 					//now, check if email exists in the database and then necessary action.
 					//check if the user exists in the database. If yes, then go ahead. Otherwise, go to linkedIn function.
@@ -265,9 +298,34 @@
 							alertMsg.children("p").remove();
 							alertMsg.fadeOut('fast');
 							if(response == "1") {
-								window.location.href = "profile.php?exist=1";	
+
+								// here, set the ID Cookie for all future correspondences!
+								$.ajax({
+									type: "GET",
+									url: "AJAXFunctions.php",
+									data: {
+										no: "6", email: getCookie("userEmail")
+									},
+									success: function(response) {
+										if(response == "-1") {
+											alert("Error in setting the Cookie ID. Please try again.");
+										}
+										else {
+											setCookie("userID", response, 150);
+										}
+									},
+									error: function(response) {
+										alert("ERROR in setting ID Cookie." + response.responseText);
+									}
+								});
+
+								// now, redirect to the profile page coz data is there in the database.
+								//window.location.href = "profile.php?exist=1";	
+								window.location.href = "home.php?exist=1";
 							}
 							else if(response == "-1") {
+
+								// redirect to the profile page. Data is not there in the database.
 								window.location.href = "profile.php?exist=-1";		
 							}
 							else {
