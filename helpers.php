@@ -384,64 +384,74 @@
 	}
 
 	// this is to get all the users in the list as thumbnails. Just a try thing.
-	function GetAllUsersList() {
+	function GetAllUsersList($mailAdd) {
 		global $connection;
 		$response = "<div class='row'>";
 		$id = "";
 		$email = "";
 		$interests = "";
 		try {
-			$query = "select * from Users";
-			$rs = mysql_query($query);
-			if(!$rs) {
+
+			if(checkIfUserExists($mailAdd) == "1") {
+
+				$query = "select * from Users";
+				$rs = mysql_query($query);
+				if(!$rs) {
+					$response = "-1";
+				}
+				else {
+					while ($res = mysql_fetch_array($rs)) {
+						$id = $res["UserID"];
+						$email = $res["UserEmail"];
+
+						$interests = getInterests($email, $id);
+						$in = explode(" @I ", $interests);
+						$interests = "";
+						foreach ($in as $i) {
+							if($i == "-" || $i == " " || $i == "" || $i == "-3") {
+
+							}
+							else {
+								$interests .= $i . ", ";
+							}
+						}  
+						$interests = substr($interests, 0, strlen($interests) - 2);
+
+						if($interests == "") {
+							$interests = "-1";
+						}
+
+						if($res["UserPic"] == "") {
+							$res["UserPic"] = "img/dp.jpg";
+						}
+
+						// <p class='userLocation'><span>Expertise in: </span> <u>" . $interests . "</u> </p>
+						if($interests == "-1") {
+							//$response .= "<div class='list-group-item item'><div class='media-left media-top'><img src='" . $res["UserPic"] . "' class='media-object userImage' width='120' height='120' /></div><div class='userItem'><p class='userName'>" . $res["UserName"] . "</p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div><button class='btn btn-lg btn-primary btn-block btnConnRequest' data-id='" . $id . "' data-email='" . $email . "' data-profile='" . $res["UserProfile"] . "'>Connect on LinkedIn</button></div>" . " (BR) ";
+							$response .= "<div class='col-lg-6 col-md-6'><div class='thumbnail'><img class='media-object userImage' width='130' height='130' src='" . $res["UserPic"] . "' /><div class='caption'><p class='userName'>" . $res["UserName"] . "</p><p class='userLocation'><span>Expertise in: </span> <u>" . "None" . "</u> </p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div><button class='btn btn-lg btn-primary btn-block btnConnRequest' data-id='" . $id . "' data-email='" . $email . "' data-profile='" . $res["UserProfile"] . "'>Connect on LinkedIn</button></div></div>" . " (BR) ";
+						}
+						else {
+							//$response .= "<div class='list-group-item item'><div class='media-left media-top'><img src='" . $res["UserPic"] . "' class='media-object userImage' width='120' height='120' /></div><div class='userItem'><p class='userName'>" . $res["UserName"] . "</p><p class='userLocation'><span>Expertise in: </span> <u>" . $interests . "</u> </p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div><button class='btn btn-lg btn-primary btn-block btnConnRequest' data-id='" . $id . "' data-email='" . $email . "' data-profile='" . $res["UserProfile"] . "'>Connect on LinkedIn</button></div>"  . " (BR) ";
+							if(strlen($interests) >= 15) {
+								$interests = substr($interests, 0, 15);
+								$interests .= "...";
+							}
+							$response .= "<div class='col-lg-6 col-md-6'><div class='thumbnail'><img class='media-object userImage' width='130' height='130' src='" . $res["UserPic"] . "' /><div class='caption'><p class='userName'>" . $res["UserName"] . "</p><p class='userLocation'><span>Expertise in: </span> <u>" . $interests . "</u> </p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div><button class='btn btn-lg btn-primary btn-block btnConnRequest' data-id='" . $id . "' data-email='" . $email . "' data-profile='" . $res["UserProfile"] . "'>Connect on LinkedIn</button></div></div>" . " (BR) ";
+						}
+					}
+				}
+				$response .= "</div>";
+			}
+			else if(checkIfUserExists($mailAdd) == "-1") {   // user does not exists.
 				$response = "-1";
 			}
 			else {
-				while ($res = mysql_fetch_array($rs)) {
-					$id = $res["UserID"];
-					$email = $res["UserEmail"];
-
-					$interests = getInterests($email, $id);
-					$in = explode(" @I ", $interests);
-					$interests = "";
-					foreach ($in as $i) {
-						if($i == "-" || $i == " " || $i == "" || $i == "-3") {
-
-						}
-						else {
-							$interests .= $i . ", ";
-						}
-					}  
-					$interests = substr($interests, 0, strlen($interests) - 2);
-
-					if($interests == "") {
-						$interests = "-1";
-					}
-
-					if($res["UserPic"] == "") {
-						$res["UserPic"] = "img/dp.jpg";
-					}
-
-					// <p class='userLocation'><span>Expertise in: </span> <u>" . $interests . "</u> </p>
-					if($interests == "-1") {
-						//$response .= "<div class='list-group-item item'><div class='media-left media-top'><img src='" . $res["UserPic"] . "' class='media-object userImage' width='120' height='120' /></div><div class='userItem'><p class='userName'>" . $res["UserName"] . "</p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div><button class='btn btn-lg btn-primary btn-block btnConnRequest' data-id='" . $id . "' data-email='" . $email . "' data-profile='" . $res["UserProfile"] . "'>Connect on LinkedIn</button></div>" . " (BR) ";
-						$response .= "<div class='col-lg-6 col-md-6'><div class='thumbnail'><img class='media-object userImage' width='130' height='130' src='" . $res["UserPic"] . "' /><div class='caption'><p class='userName'>" . $res["UserName"] . "</p><p class='userLocation'><span>Expertise in: </span> <u>" . "None" . "</u> </p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div><button class='btn btn-lg btn-primary btn-block btnConnRequest' data-id='" . $id . "' data-email='" . $email . "' data-profile='" . $res["UserProfile"] . "'>Connect on LinkedIn</button></div></div>" . " (BR) ";
-					}
-					else {
-						//$response .= "<div class='list-group-item item'><div class='media-left media-top'><img src='" . $res["UserPic"] . "' class='media-object userImage' width='120' height='120' /></div><div class='userItem'><p class='userName'>" . $res["UserName"] . "</p><p class='userLocation'><span>Expertise in: </span> <u>" . $interests . "</u> </p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div><button class='btn btn-lg btn-primary btn-block btnConnRequest' data-id='" . $id . "' data-email='" . $email . "' data-profile='" . $res["UserProfile"] . "'>Connect on LinkedIn</button></div>"  . " (BR) ";
-						if(strlen($interests) >= 15) {
-							$interests = substr($interests, 0, 15);
-							$interests .= "...";
-						}
-						$response .= "<div class='col-lg-6 col-md-6'><div class='thumbnail'><img class='media-object userImage' width='130' height='130' src='" . $res["UserPic"] . "' /><div class='caption'><p class='userName'>" . $res["UserName"] . "</p><p class='userLocation'><span>Expertise in: </span> <u>" . $interests . "</u> </p><p class='userReadMore'><a class='readMoreLink' data-id='" . $id . "' data-email='" . $email . "' href='#'>Read More...</a></p></div><button class='btn btn-lg btn-primary btn-block btnConnRequest' data-id='" . $id . "' data-email='" . $email . "' data-profile='" . $res["UserProfile"] . "'>Connect on LinkedIn</button></div></div>" . " (BR) ";
-					}
-				}
+				$response = "-2";
 			}
-			$response .= "</div>";
 			return $response;
 		}
 		catch(Exception $e) {
-			$response = "-1";
+			$response = "-2";
 			return $response;
 		}
 	}

@@ -17,7 +17,7 @@
 		SaveUpdateInterests($_GET["id"], $_GET["email"], $_GET["i1"], $_GET["i2"], $_GET["i3"], $_GET["i4"], $_GET["i5"], $_GET["i6"], $_GET["i7"]);
 	}
 	else if(isset($_GET["no"]) && $_GET["no"] == "4") {   //for getting all the users from the database
-		GetAllUsers();
+		GetAllUsers($_GET["email"]);
 	}
 	else if(isset($_GET["no"]) && $_GET["no"] == "5") {   //for getting all the users from the database
 		UserExists($_GET["email"], $_GET["id"]);
@@ -133,7 +133,7 @@
 		global $connection;
 		$res = "";
 		try {
-			$query = "update Users set UserAssociation='$userAssoc' where UserEmail='$email' and UserID='$id'";
+			$query = "update Users set UserAssociation='$userAssoc' where UserEmail='$email'";
 			$rs = mysql_query($query);
 			if(!$rs) {
 				$res = "-1";
@@ -274,11 +274,11 @@
 	}
 
 	//this is the function to get all the list of the users from the database.
-	function GetAllUsers() {
+	function GetAllUsers($email) {
 		global $connection;
 		$res = "";
 		try {
-			$res = GetAllUsersList();
+			$res = GetAllUsersList($email);
 			echo $res;
 		}
 		catch(Exception $e) {
@@ -482,6 +482,23 @@
 		global $connection;
 		try {
 			if(checkIfUserExists($email) == "-1") {
+
+				// firstly, check if all the data, that comes from linkedIn exists or not.
+				if(!isset($email))
+					$email = "";
+				if(!isset($name))
+					$name = "";
+				if(!isset($picJson))
+					$picJson = "";
+				if(!isset($contact))
+					$contact = "";
+				if(!isset($basic["publicProfileUrl"]))
+					$basic["publicProfileUrl"] = "";
+				if(!isset($basic["location"]["name"]) || !isset($basic["location"]))
+					$basic["location"]["name"] = "";
+				if(!isset($basic["primaryTwitterAccount"]["providerAccountName"]) || !isset($basic["primaryTwitterAccount"])) 
+					$basic["primaryTwitterAccount"]["providerAccountName"] = "";
+
 				//go ahead and insert the user with all the data here.
 				if(savePersonalDetails($email, $name, $picJson, $contact, $basic["publicProfileUrl"], $basic["location"]["name"], $basic["primaryTwitterAccount"]["providerAccountName"], "", "", $date) == "1") {
 					$res = "1";   //for saving into the database correctly!
