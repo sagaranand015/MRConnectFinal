@@ -26,6 +26,8 @@
 		<link href="css/styles.css" rel="stylesheet" media="screen" />
 
     	<style type="text/css">
+
+    	
 	    	@font-face {
 	    		font-family: regularText;
 	    		src: url('fonts/AlegreyaSansSC-Regular.ttf');
@@ -290,6 +292,8 @@
 			// $('.allList').children('.btn').remove();
 
 			console.log(getCookie('userEmail'));
+
+			// here, first check if the user logged in is verified or not. If not, then show a blank page with an Error message.
 
 			alertMsg.children('p').remove();
 			alertMsg.append("<p>Building the MR - Network... Please wait</p>").fadeIn();

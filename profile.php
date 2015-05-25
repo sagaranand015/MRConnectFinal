@@ -62,6 +62,11 @@
 	    		src: url('fonts/AlegreyaSansSC-Medium.ttf');
 	    	}
 
+	    	@font-face {
+	    		font-family: writingText;
+	    		src: url('fonts/SEGOEUIL.ttf');
+	    	}
+
 	    	h1 h2 h3 h4 h5 h6 p span {
 	    		font-family: regularText;
 	    		color:black;
@@ -285,16 +290,20 @@
 				//check for queryStrings here.
         		if(qs["exist"] == "1") {    //if both the cookies exist. User exists in the database.
         			//IN.User.authorize(onlyAuthenticate);
-
         			// this is without the linkedIn authorization Call.
         			onlyAuthenticate();
         		}
         		else if(qs["exist"] == "-1") {
-        			IN.User.authorize(linkedInAuth);	
+
+        			// do all the coupon related stuff here. If the coupon code is correct, go to linkedIn authentication and save the user in the database.
+        			// if incorrect, keep the modal box open and keep asking for the coupon code.
+        			$('.couponModal').modal('show');
+        			// NOTE: if linkedIn authentication is reached, go ahead and mark the user as activated in the database.
+
+        			//IN.User.authorize(linkedInAuth);	
         		}
         		else {
         			//IN.User.authorize(onlyAuthenticate);
-
         			onlyAuthenticate();
         		} 
 	        }   //end of the onLinkedInLoad function!!
@@ -549,19 +558,28 @@
 	        			response = res[0];
 	        			var res2 = res[1];
 
-	        			if(res2 == "-4") {    //data not loaded successfully.
-        					// populateData(response);
-        					alertMsg.children('p').remove();
+	        			if(response == "-5") {    // for non-verified user.
+	        				alertMsg.children('p').remove();
         					alertMsg.fadeOut();
         					popup.children('p').remove();
-        					alertMsg.append("<p>Oops! We enountered an error in getting your profile data. Please refresh or try again later.</p>").fadeIn();
-	        			}
-	        			else {    //data is loaded successfully and ready to be shown to the user.
-	        				//populateData(response);
-	        			}
+        					popup.append("<p>We're sorry, but we could not verify your Account on MR - Connect. Please go ahead and Enter the Coupon Code for Account Verification.</p>").fadeIn();
 
-	        			//to show the data to the page 
-	        			populateData(response);
+        					// show the coupons Modal here. Code for Updating the Verification Status to be written here.
+        					//$('.couponModal').modal('show');
+	        			}
+	        			else {
+	        				if(res2 == "-4") {    //data not loaded successfully.
+	        					// populateData(response);
+	        					alertMsg.children('p').remove();
+	        					alertMsg.fadeOut();
+	        					popup.children('p').remove();
+	        					popup.append("<p>Oops! We enountered an error in getting your profile data. Please refresh or try again later.</p>").fadeIn();
+		        			}
+		        			else {    //data is loaded successfully and ready to be shown to the user.
+		        			}
+		        			//to show the data to the page 
+		        			populateData(response);
+	        			}
 	        		},
 	        		error: function(response) {
 	        			alert("Error in getting the data from the database. " + response.responseText);
@@ -610,8 +628,10 @@
 	                    console.log("This is saving the cookie in the profile when data comes from linkedin: " + mail);
 	                    setCookie("userEmail", mail, 150);
 
-	                    //all the data from the user's linkedin profile goes here into the AJAx call and then saved in to the database.
+	                    // hide the coupon modal here. The below code runs only after the user has clicked the activate button in the coupons modal.
+	                    $('.couponModal').modal('hide');
 
+	                    //all the data from the user's linkedin profile goes here into the AJAx call and then saved in to the database.
 	                    alertMsg.children('p').remove();
 	                    alertMsg.append("<p>Getting profile info... Please wait</p>").fadeIn();
 	                    $.ajax({
@@ -662,7 +682,7 @@
 	                    			alert("Error in saving data!  " + r);
 	                    		}
 	                    	}
-	                    });
+	                    });   // end of the AJAX call saving user data to the database.
 
 	                    $('#headName').text(memData.firstName + "  " + memData.lastName);
 	                    $('.displayImg').attr('src', memData.pictureUrls.values[0]);  
@@ -1067,7 +1087,54 @@
 					});
 				});
 
-			});
+				$('#btnCouponCode').on('click', function() {
+					alertMsg.children("p").remove();
+					alertMsg.append("<p>Please wait for a moment while we verify your coupon code...</p>").fadeIn();
+
+					var couponCode = $('#txtCouponCode').val();
+
+					// for verifying the coupon code.
+					$.ajax({
+						type: "GET",
+						url: "AJAXFunctions.php",
+						data: {
+							no: "16", couponCode: couponCode
+						},
+						success: function(response) {
+
+							response = $.trim(response);
+
+							alertMsg.children('p').remove();
+							alertMsg.fadeOut();
+
+							if(response == "1") {
+								// make the call to the linkedin Authorization function.
+								IN.User.authorize(linkedInAuth);	
+							}
+							else if(response == "2") {
+								popup.children('p').remove();
+								popup.append("<p>Oops! The coupon code you entered does not seem to be correct. Please try again with the correct coupon code.</p>").fadeIn();	
+							}
+							else if(response == "3") {
+								popup.children('p').remove();
+								popup.append("<p>Oops! The coupon code you entered seems to have expired. Please try again with the Valid Coupon Code.</p>").fadeIn();									
+							}
+							else {
+								popup.children('p').remove();
+								popup.append("<p>Oops! We encountered an error while checking for your Coupon code. Please try again.</p>").fadeIn();		
+							}
+						},
+						error: function() {
+							alertMsg.children('p').remove();
+							alertMsg.fadeOut();
+							popup.children('p').remove();
+							popup.append("<p>Oops! We encountered an error while checking for your Coupon code. Please try again.</p>").fadeIn();	
+						}
+					});
+
+				});
+
+			});   // end of document ready.
 		</script>
 
 		<script>
@@ -1470,6 +1537,66 @@
 		        	<button class="btn btn-lg btn-primary expBtnUpdate">
 		        		Update
 		        	</button>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		      </div>
+		    </div><!-- /.modal-content -->
+		  </div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+
+		<!-- this is for the coupon modal that appears for the user activation -->
+		<div class="modal fade couponModal">
+		  <div class="modal-dialog">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h4 class="modal-title couponModalTitle">
+		        	Activate your MR - Connect Account
+		        </h4>
+		      </div>
+		      <div class="modal-body couponModalBody">
+
+		        <table class="table">
+		        	<tr>
+		        		<td>
+		        			<p style="text-align: left; font-family: writingText; font-size: 1.2em;">
+								<b>Welcome to MR - Connect!</b>
+							</p>
+
+							<p style="text-align: left; font-family: writingText; font-size: 1.2em;">
+								Please enter the coupon code for using the services of MR - Connect. In case you don't have the coupon code, please go ahead and request an invite.
+							</p>
+
+							<p style="text-align: left; font-family: writingText; font-size: 1.2em;">
+								In case of any problems, please drop in a mail to <code>tech@mentored-research.com</code> and we'll get back to you in 48 hours.
+							</p>
+
+							<p style="text-align: left; font-family: writingText; font-size: 1.2em;">
+								Thank You.
+							</p>
+		        		</td>
+		        	</tr>
+            		<tr>
+            			<td>
+            				<input type="text" id="txtCouponCode" class="form-control" placeholder="Enter Coupon code *" />
+            			</td>
+            		</tr>
+            		<tr>
+            			<td>
+            				<button class="btn btn-lg btn-block btn-primary" id="btnCouponCode" style="font-family: boldText;">
+            					Activate
+            				</button>
+            			</td>
+            		</tr>
+            		<tr>
+            			<td>
+            				<button class="btn btn-lg btn-block btn-primary" id="btnRequestInvite" style="font-family: boldText;">
+            					Request an Invite
+            				</button>
+            			</td>
+            		</tr>
+                </table>
 		      </div>
 		      <div class="modal-footer">
 		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

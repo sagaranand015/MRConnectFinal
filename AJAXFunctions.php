@@ -52,8 +52,25 @@
 	else if(isset($_GET["no"]) && $_GET["no"] == "15") {     // to submit the questions given based on category
 		SubmitQuestions($_GET["id"], $_GET["email"], $_GET["category"], $_GET["question"]);
 	}	
+	else if(isset($_GET["no"]) && $_GET["no"] == "16") {     // to check the coupon code entered is correct or not.
+		CouponCode($_GET["couponCode"]);
+	}	
 	else {
 		echo "Nothing to be returned by the AJAX call. No Parameter does not match any value.";
+	}
+
+	// this is the function to check for the coupon code in the database.
+	// returns 1 if the coupon exists and is valid. 2 if the coupon does not exist. 3 if an invalid coupon exists. -1 on error.
+	function CouponCode($couponCode) {
+		$res = "-1";
+		try {
+			$res = CheckCouponCode($couponCode);
+			echo $res;
+		}
+		catch(Exception $e) {
+			$res = "-1";
+			echo $res;
+		}
 	}
 
 	// this is the function to submit the asked question based on category
@@ -343,52 +360,64 @@
 				$res = "-2";  //user does not exists. Add the user here.
 			}
 			else {
-				$per = getPersonalData($email, $id);
-				$edu = getEducationData($email, $id);
-				$exp = getExperienceData($email, $id);
-				$intr = getInterests($email, $id);
 
-				if($per == "" || $per == "-1") {
-					$res2 = "-4";
-					$res .= "-4" . " @bk ";
-					// echo $res;
-					// return;
-				}
-				else {
-					$res .= $per . " @bk ";
-				}
+				// Also, check if the user here is Verified or not. If verified, go ahead. Else, return with a code(-5 for non verified user.).
+				if(IsVerifiedUser($email) == "1")  {
 
-				if($edu == "" || $edu == "-1") {
-					$res2 = "-4";
-					$res .= "-4" . " @bk ";
-					// echo $res;
-					// return;
-				}
-				else {
-					$res .= $edu . " @bk ";
-				}
+					$per = getPersonalData($email, $id);
+					$edu = getEducationData($email, $id);
+					$exp = getExperienceData($email, $id);
+					$intr = getInterests($email, $id);
 
-				if($exp == "" || $exp == "-1") {
-					$res2 = "-4";
-					$res .= "-4" . " @bk ";
-					// echo $res;
-					// return;
-				}
-				else {
-					$res .= $exp . " @bk ";
-				}
+					if($per == "" || $per == "-1") {
+						$res2 = "-4";
+						$res .= "-4" . " @bk ";
+						// echo $res;
+						// return;
+					}
+					else {
+						$res .= $per . " @bk ";
+					}
 
-				if($intr == "" || $intr == "-1") {
-					$res2 = "-4";
-					$res .= "-4" . " @bk ";
-					// echo $res;
-					// return;
-				}
-				else if($intr == "-3") {
-					$res .= "-5" . " @bk ";    // -5 is for when the data row does not exists.
-				}
+					if($edu == "" || $edu == "-1") {
+						$res2 = "-4";
+						$res .= "-4" . " @bk ";
+						// echo $res;
+						// return;
+					}
+					else {
+						$res .= $edu . " @bk ";
+					}
+
+					if($exp == "" || $exp == "-1") {
+						$res2 = "-4";
+						$res .= "-4" . " @bk ";
+						// echo $res;
+						// return;
+					}
+					else {
+						$res .= $exp . " @bk ";
+					}
+
+					if($intr == "" || $intr == "-1") {
+						$res2 = "-4";
+						$res .= "-4" . " @bk ";
+						// echo $res;
+						// return;
+					}
+					else if($intr == "-3") {
+						$res .= "-5" . " @bk ";    // -5 is for when the data row does not exists.
+					}
+					else {
+						$res .= $intr . " @bk ";
+					}
+
+				} 
+				else if(IsVerifiedUser($email) == "0") {
+					$res = "-5";   // for non-verified user.
+				}	
 				else {
-					$res .= $intr . " @bk ";
+					$res = "-1";
 				}
 			}
 			echo $res . " ~ " . $res2;
