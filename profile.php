@@ -337,8 +337,8 @@
 
     				if(pers == undefined || pers == "-4") {
     					loaded = false;
-    					popup.children('p').remove();
-    					popup.append("<p>Unable to retrieve your profile data. Please try again.</p>").fadeIn();
+    					// popup.children('p').remove();
+    					// popup.append("<p>Unable to retrieve your profile data. Please try again.</p>").fadeIn();
     				}
     				else {
     					//for the personal contact thing of the user
@@ -371,8 +371,8 @@
 
     				if(educt == undefined || educt == "-4") {
     					loaded = false;
-    					popup.children('p').remove();
-    					popup.append("<p>Unable to retrieve your profile data. Please try again.</p>").fadeIn();
+    					// popup.children('p').remove();
+    					// popup.append("<p>Unable to retrieve your profile data. Please try again.</p>").fadeIn();
     				}
     				else {
     					//now, for populating the Education fields.
@@ -420,8 +420,8 @@
                     
     				if(expr == undefined || expr == "-4") {
     					loaded = false;
-    					popup.children('p').remove();
-    					popup.append("<p>Unable to retrieve your profile data. Please try again.</p>").fadeIn();
+    					// popup.children('p').remove();
+    					// popup.append("<p>Unable to retrieve your profile data. Please try again.</p>").fadeIn();
     				}
     				else {
     					//for populating the Experience Fields
@@ -469,8 +469,8 @@
 
     				if(intr == undefined || intr == "-4") {
     					loaded = false;
-    					popup.children('p').remove();
-    					popup.append("<p>Unable to retrieve your profile data in Interests. Please try again.</p>").fadeIn();
+    					// popup.children('p').remove();
+    					// popup.append("<p>Unable to retrieve your profile data in Interests. Please try again.</p>").fadeIn();
     				}
     				else if(intr == "-5") {  //this is when the data row does not exists.
     					loaded = false;
@@ -564,8 +564,8 @@
         					popup.children('p').remove();
         					popup.append("<p>We're sorry, but we could not verify your Account on MR - Connect. Please go ahead and Enter the Coupon Code for Account Verification.</p>").fadeIn();
 
-        					// show the coupons Modal here. Code for Updating the Verification Status to be written here.
-        					//$('.couponModal').modal('show');
+        					// show the coupons Modal here for updating the Verification Status of the user.
+        					$('.couponUpdateModal').modal('show');
 	        			}
 	        			else {
 	        				if(res2 == "-4") {    //data not loaded successfully.
@@ -573,7 +573,8 @@
 	        					alertMsg.children('p').remove();
 	        					alertMsg.fadeOut();
 	        					popup.children('p').remove();
-	        					popup.append("<p>Oops! We enountered an error in getting your profile data. Please refresh or try again later.</p>").fadeIn();
+	        					popup.fadeOut();
+	        					//popup.append("<p>Oops! We enountered an error in getting your profile data. Please refresh or try again later.</p>").fadeIn();
 		        			}
 		        			else {    //data is loaded successfully and ready to be shown to the user.
 		        			}
@@ -602,22 +603,22 @@
 	                    var jsonPhone = "", jsonPic = "", jsonEdu = "", jsonExp = "";
 
 	                    //var jsonBasic = JSON.stringify(memData);
-	                    if(memData.phoneNumbers.values == undefined) {
+	                    if(memData.phoneNumbers == undefined || memData.phoneNumbers.values == undefined) {
 	                    }
 	                    else {
 	                    	jsonPhone = JSON.stringify(memData.phoneNumbers.values[0]);
 	                    }
-	                    if(memData.pictureUrls.values == undefined) {
+	                    if(memData.pictureUrls == undefined || memData.pictureUrls.values == undefined) {
 	                    }
 	                    else {
 	                    	jsonPic = JSON.stringify(memData.pictureUrls.values[0]);
 	                    }
-	                    if(memData.educations.values == undefined) {
+	                    if(memData.educations == undefined || memData.educations.values == undefined) {
 	                    }
 	                    else {
 	                    	jsonEdu = JSON.stringify(memData.educations.values);
 	                    }
-	                    if(memData.positions.values == undefined) {
+	                    if(memData.positions == undefined || memData.positions.values == undefined) {
 	                    }
 	                    else {
 	                    	jsonExp = JSON.stringify(memData.positions.values);
@@ -630,6 +631,7 @@
 
 	                    // hide the coupon modal here. The below code runs only after the user has clicked the activate button in the coupons modal.
 	                    $('.couponModal').modal('hide');
+	                    $('.couponUpdateModal').modal('hide');
 
 	                    //all the data from the user's linkedin profile goes here into the AJAx call and then saved in to the database.
 	                    alertMsg.children('p').remove();
@@ -697,7 +699,7 @@
                     	$('.contact').attr('data-content', phno);
 
                     	var ph = "";
-                    	if(memData.phoneNumbers.values == undefined) {
+                    	if(memData.phoneNumbers == undefined || memData.phoneNumbers.values == undefined) {
                     	}
                     	else {
                 			ph = memData.phoneNumbers.values;
@@ -736,37 +738,43 @@
                 		}
 
 	                    //now, for the education listing from linkedin API
-	                    var edu = memData.educations.values;
-	                    var markup = "";
+	                    if(memData.educations == undefined || memData.educations.values == undefined) {
 
-	                    //for removing the tables!
-	                    $('.education').children('table').remove();
+	                    }
+	                    else {
+		                    var edu = memData.educations.values;
+		                    var markup = "";
 
-	                    for(var i = 0;i<edu.length;i++) {
+		                    //for removing the tables!
+		                    $('.education').children('table').remove();
 
-	                        if(edu[i].startDate == undefined) {
-	                        	edu[i].startDate = {year: ""};
-	                        }
-	                        if(edu[i].endDate == undefined) {
-	                        	edu[i].endDate = {year: ""};	
-	                        }
-	                        if(edu[i].schoolName == undefined) {
-	                        	edu[i].schoolName = "Add School Name";	
-	                        }
-	                        if(edu[i].degree == undefined) {
-	                        	edu[i].degree = "Add Degree";	
-	                        }
-	                        if(edu[i].fieldOfStudy == undefined) {
-	                        	edu[i].fieldOfStudy = "Add Field Of Study";	
-	                        }
+		                    for(var i = 0;i<edu.length;i++) {
 
-	                        //console.log(edu[i]);
-	                        console.log(edu[i].schoolName + " -> " + edu[i].degree + " -> " + edu[i].startDate + " -> " + edu[i].endDate + " -> " + edu[i].fieldOfStudy);
+		                        if(edu[i].startDate == undefined) {
+		                        	edu[i].startDate = {year: ""};
+		                        }
+		                        if(edu[i].endDate == undefined) {
+		                        	edu[i].endDate = {year: ""};	
+		                        }
+		                        if(edu[i].schoolName == undefined) {
+		                        	edu[i].schoolName = "Add School Name";	
+		                        }
+		                        if(edu[i].degree == undefined) {
+		                        	edu[i].degree = "Add Degree";	
+		                        }
+		                        if(edu[i].fieldOfStudy == undefined) {
+		                        	edu[i].fieldOfStudy = "Add Field Of Study";	
+		                        }
 
-	                        //here, add each school to the HTML Markup.
-	                        markup += "<table class='table table-responsive table-striped eduTable'><tr><td><p id='eduSchoolName class='schoolName' data-content='" + edu[i].schoolName + "'><span>" + edu[i].schoolName + "</span><a class='glyphicon glyphicon-pencil eduEditButton' aria-hidden='true'></a></p></td><tr><td><p id='eduDate' class='date' data-content='" + edu[i].startDate.year + " - " + edu[i].endDate.year + "'><span>" + edu[i].startDate.year + " - " + edu[i].endDate.year + "</span><a class='glyphicon glyphicon-pencil eduEditButton' aria-hidden='true'></a></p></td></tr><tr><td><p id='eduDegree' class='degree' data-content='" + edu[i].degree +  "'><span>" + edu[i].degree +  "</span><a class='glyphicon glyphicon-pencil eduEditButton' aria-hidden='true'></a></p></tr><tr></td><td><p id='eduFOS' class='fos' data-content='" + edu[i].fieldOfStudy + "'><span>" + edu[i].fieldOfStudy + "</span><a class='glyphicon glyphicon-pencil eduEditButton' aria-hidden='true'></a></p>	</td></tr></table>";
-	                    }   //end of for loop
-	                    $('.education').append(markup);
+		                        //console.log(edu[i]);
+		                        console.log(edu[i].schoolName + " -> " + edu[i].degree + " -> " + edu[i].startDate + " -> " + edu[i].endDate + " -> " + edu[i].fieldOfStudy);
+
+		                        //here, add each school to the HTML Markup.
+		                        markup += "<table class='table table-responsive table-striped eduTable'><tr><td><p id='eduSchoolName class='schoolName' data-content='" + edu[i].schoolName + "'><span>" + edu[i].schoolName + "</span><a class='glyphicon glyphicon-pencil eduEditButton' aria-hidden='true'></a></p></td><tr><td><p id='eduDate' class='date' data-content='" + edu[i].startDate.year + " - " + edu[i].endDate.year + "'><span>" + edu[i].startDate.year + " - " + edu[i].endDate.year + "</span><a class='glyphicon glyphicon-pencil eduEditButton' aria-hidden='true'></a></p></td></tr><tr><td><p id='eduDegree' class='degree' data-content='" + edu[i].degree +  "'><span>" + edu[i].degree +  "</span><a class='glyphicon glyphicon-pencil eduEditButton' aria-hidden='true'></a></p></tr><tr></td><td><p id='eduFOS' class='fos' data-content='" + edu[i].fieldOfStudy + "'><span>" + edu[i].fieldOfStudy + "</span><a class='glyphicon glyphicon-pencil eduEditButton' aria-hidden='true'></a></p>	</td></tr></table>";
+		                    }   //end of for loop
+		                    $('.education').append(markup);
+
+	                    }   // end of else.
 
 	                    //for all the events that happen to the dynamic elements!
 	                    var eduEditButton = $('.eduEditButton').hide();
@@ -804,40 +812,46 @@
 
 
 	                    //now, for all the experience listing here.
-	                    var exp = memData.positions.values;
-	                    console.log(exp);
+	                    if(memData.positions == undefined || memData.positions.values == undefined) {
+	                    }
+	                    else {
+	                    	var exp = memData.positions.values;
+		                    console.log(exp);
 
-	                    var expMarkup = "";
+		                    var expMarkup = "";
 
-	                    //for removing the previous entry
-	                    $('.experience').children('table').remove();
+		                    //for removing the previous entry
+		                    $('.experience').children('table').remove();
 
-	                    for(var i = 0;i<exp.length;i++) {
-	                    	if(exp[i].startDate == undefined) {
-	                        	exp[i].startDate = {year: ""};
-	                        }
-	                        if(exp[i].endDate == undefined) {
-	                        	exp[i].endDate = {year: ""};	
-	                        }
-	                        if(exp[i].company == undefined) {
-	                        	exp[i].company = {name: ""};	
-	                        }
-	                        if(exp[i].title == undefined || exp[i].title == "") {
-	                        	exp[i].title = "";	
-	                        }
-	                        if(exp[i].summary == undefined) {
-                        		exp[i].summary = "Summary here";
-	                        }
-	                        if(exp[i].isCurrent == true) {
-	                        	exp[i].endDate = {year: "Currently Working Here"};
-	                        }
+		                    for(var i = 0;i<exp.length;i++) {
+		                    	if(exp[i].startDate == undefined) {
+		                        	exp[i].startDate = {year: ""};
+		                        }
+		                        if(exp[i].endDate == undefined) {
+		                        	exp[i].endDate = {year: ""};	
+		                        }
+		                        if(exp[i].company == undefined) {
+		                        	exp[i].company = {name: ""};	
+		                        }
+		                        if(exp[i].title == undefined || exp[i].title == "") {
+		                        	exp[i].title = "";	
+		                        }
+		                        if(exp[i].summary == undefined) {
+	                        		exp[i].summary = "Summary here";
+		                        }
+		                        if(exp[i].isCurrent == true) {
+		                        	exp[i].endDate = {year: "Currently Working Here"};
+		                        }
 
-	                    	console.log(exp[i].company.name + " -> " + exp[i].title + " -> " + exp[i].startDate.year + " -> " + exp[i].endDate.year + " -> " );
+		                    	console.log(exp[i].company.name + " -> " + exp[i].title + " -> " + exp[i].startDate.year + " -> " + exp[i].endDate.year + " -> " );
 
-	                    	//here, add each experience listing to the HTML Markup.
-	                        expMarkup += "<table class='table table-responsive table-striped expTable'><tr><td><p id='eduCompanyName class='companyName' data-content='" + exp[i].company.name + "'><span>" + exp[i].company.name + "</span><a class='glyphicon glyphicon-pencil expEditButton' aria-hidden='true'></a></p></td><tr><td><p id='expDate' class='date' data-content='" + exp[i].startDate.year + " - " + exp[i].endDate.year + "'><span>" + exp[i].startDate.year + " - " + exp[i].endDate.year + "</span><a class='glyphicon glyphicon-pencil expEditButton' aria-hidden='true'></a></p></td></tr><tr><td><p id='expTitle' class='title' data-content='" + exp[i].title +  "'><span>" + exp[i].title +  "</span><a class='glyphicon glyphicon-pencil expEditButton' aria-hidden='true'></a></p></tr><tr></td><td><p id='expSummary' class='summary' data-content='" + exp[i].summary + "'><span>" + exp[i].summary + "</span><a class='glyphicon glyphicon-pencil expEditButton' aria-hidden='true'></a></p>	</td></tr></table>";
-	                    }   //end of for loop
-	                    $('.experience').append(expMarkup);
+		                    	//here, add each experience listing to the HTML Markup.
+		                        expMarkup += "<table class='table table-responsive table-striped expTable'><tr><td><p id='eduCompanyName class='companyName' data-content='" + exp[i].company.name + "'><span>" + exp[i].company.name + "</span><a class='glyphicon glyphicon-pencil expEditButton' aria-hidden='true'></a></p></td><tr><td><p id='expDate' class='date' data-content='" + exp[i].startDate.year + " - " + exp[i].endDate.year + "'><span>" + exp[i].startDate.year + " - " + exp[i].endDate.year + "</span><a class='glyphicon glyphicon-pencil expEditButton' aria-hidden='true'></a></p></td></tr><tr><td><p id='expTitle' class='title' data-content='" + exp[i].title +  "'><span>" + exp[i].title +  "</span><a class='glyphicon glyphicon-pencil expEditButton' aria-hidden='true'></a></p></tr><tr></td><td><p id='expSummary' class='summary' data-content='" + exp[i].summary + "'><span>" + exp[i].summary + "</span><a class='glyphicon glyphicon-pencil expEditButton' aria-hidden='true'></a></p>	</td></tr></table>";
+		                    }   //end of for loop
+		                    $('.experience').append(expMarkup);
+
+	                    }   // end of else.
+	                    
 
 	                    //for all the events that happen to the dynamic elements in the experience listings page!
 	                    var expEditButton = $('.expEditButton').hide();
@@ -1131,7 +1145,65 @@
 							popup.append("<p>Oops! We encountered an error while checking for your Coupon code. Please try again.</p>").fadeIn();	
 						}
 					});
+					return false;
+				});
 
+				// for the Coupon update Modal button.
+				$('#btnCouponCodeUpdate').on('click', function() {
+
+					alertMsg.children("p").remove();
+					alertMsg.append("<p>Please wait for a moment while we verify your coupon code...</p>").fadeIn();
+
+					var couponCode = $('#txtCouponCodeUpdate').val();
+					// for verifying the coupon code and updating the verification Status of the user.
+					$.ajax({
+						type: "GET",
+						url: "AJAXFunctions.php",
+						data: {
+							no: "17", couponCode: couponCode, email: getCookie("userEmail")
+						},
+						success: function(response) {
+							response = $.trim(response);
+
+							r = response.split(" ~ ");
+							response = r[0];
+							res2 = r[1];
+
+							alertMsg.children('p').remove();
+							alertMsg.fadeOut();
+
+							if(response == "1") {
+								// make the call to the linkedin Authorization function.
+								IN.User.authorize(linkedInAuth);	
+							}
+							else {
+								if(res2 == "1") {
+									popup.children('p').remove();
+									popup.append("<p>Oops! We could not verify your MR - Connect due to an error. Please try again.</p>").fadeIn();	
+								}
+								else if(res2 == "2") {
+									popup.children('p').remove();
+									popup.append("<p>Oops! The coupon code you entered does not seem to be correct. Please try again with the correct coupon code.</p>").fadeIn();	
+								}
+								else if(res2 == "3") {
+									popup.children('p').remove();
+									popup.append("<p>Oops! The coupon code you entered seems to have expired. Please try again with the Valid Coupon Code.</p>").fadeIn();									
+								}
+								else {
+									popup.children('p').remove();
+									popup.append("<p>Oops! We encountered an error while checking for your Coupon code. Please try again.</p>").fadeIn();		
+								}
+							} 
+						},
+						error: function() {
+							alertMsg.children('p').remove();
+							alertMsg.fadeOut();
+							popup.children('p').remove();
+							popup.append("<p>Oops! We encountered an error while checking for your Coupon code. Please try again.</p>").fadeIn();	
+						}
+					});
+
+					return false;
 				});
 
 			});   // end of document ready.
@@ -1592,6 +1664,66 @@
             		<tr>
             			<td>
             				<button class="btn btn-lg btn-block btn-primary" id="btnRequestInvite" style="font-family: boldText;">
+            					Request an Invite
+            				</button>
+            			</td>
+            		</tr>
+                </table>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		      </div>
+		    </div><!-- /.modal-content -->
+		  </div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+
+		<!-- this is for the coupon modal that appears for the user activation [for updation]-->
+		<div class="modal fade couponUpdateModal">
+		  <div class="modal-dialog">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h4 class="modal-title couponUpdateModalTitle">
+		        	Activate your MR - Connect Account
+		        </h4>
+		      </div>
+		      <div class="modal-body couponUpdateModalBody">
+
+		        <table class="table">
+		        	<tr>
+		        		<td>
+		        			<p style="text-align: left; font-family: writingText; font-size: 1.2em;">
+								<b>Welcome to MR - Connect!</b>
+							</p>
+
+							<p style="text-align: left; font-family: writingText; font-size: 1.2em;">
+								It appears to us that your MR - Connect account has not been activated yet. Please enter the coupon code for Account Activation. In case you don't have the coupon code, please go ahead and request an invite.
+							</p>
+
+							<p style="text-align: left; font-family: writingText; font-size: 1.2em;">
+								In case of any problems, please drop in a mail to <code>tech@mentored-research.com</code> and we'll get back to you in 48 hours.
+							</p>
+
+							<p style="text-align: left; font-family: writingText; font-size: 1.2em;">
+								Thank You.
+							</p>
+		        		</td>
+		        	</tr>
+            		<tr>
+            			<td>
+            				<input type="text" id="txtCouponCodeUpdate" class="form-control" placeholder="Enter Coupon code *" />
+            			</td>
+            		</tr>
+            		<tr>
+            			<td>
+            				<button class="btn btn-lg btn-block btn-primary" id="btnCouponCodeUpdate" style="font-family: boldText;">
+            					Activate
+            				</button>
+            			</td>
+            		</tr>
+            		<tr>
+            			<td>
+            				<button class="btn btn-lg btn-block btn-primary btnInvite" id="btnRequestInviteUpdate" style="font-family: boldText;">
             					Request an Invite
             				</button>
             			</td>

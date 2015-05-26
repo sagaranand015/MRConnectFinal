@@ -206,19 +206,20 @@
 									},
 									success: function(response) {
 										if(response == "-1") {
-											alert("Error. Please try again.");
+											alert("2. Error in setting the Cookie ID. Please try again.");
 										}
 										else {
 											setCookie("userID", response, 150);
+
+											window.location.href = "home.php?exist=1";	
 										}
 									},
-									error: function(response) {
-										//alert("ERROR in setting ID Cookie." + response.responseText);
+									error: function(resp) {
+										alert("Here 2. ERROR in setting ID Cookie." + resp.responseText);
 									}
 								});
 
 								// to go the network page bcoz the data already exists in the database.
-								window.location.href = "home.php?exist=1";	
 							}
 							else if(response == "-1") {   // user does not exists! So, the -1.
 
@@ -300,7 +301,7 @@
 							alertMsg.fadeOut('fast');
 							if(response == "1") {
 
-								// here, set the ID Cookie for all future correspondences!
+								// // here, set the ID Cookie for all future correspondences!
 								$.ajax({
 									type: "GET",
 									url: "AJAXFunctions.php",
@@ -309,20 +310,22 @@
 									},
 									success: function(response) {
 										if(response == "-1") {
-											alert("Error in setting the Cookie ID. Please try again.");
+											alert("1. Error in setting the Cookie ID. Please try again.");
 										}
 										else {
 											setCookie("userID", response, 150);
+
+											window.location.href = "home.php?exist=1";
 										}
 									},
-									error: function(response) {
-										alert("ERROR in setting ID Cookie." + response.responseText);
+									error: function(resp) {
+										alert("here 1: ERROR in setting ID Cookie." + resp.responseText);
 									}
 								});
 
 								// now, redirect to the home page coz data is there in the database.
 								//window.location.href = "profile.php?exist=1";	
-								window.location.href = "home.php?exist=1";
+								//window.location.href = "home.php?exist=1";
 							}
 							else if(response == "-1") {
 								// redirect to the profile page. Data is not there in the database.
@@ -338,6 +341,31 @@
 						error: function(response) {
 							alert("Error. " + response.responseText);
 						}
+					}).done(function() {
+
+						// here, set the ID Cookie for all future correspondences!
+						// alertMsg.children('p').remove();
+						// alertMsg.append("<p>SEtting the ID Cookie. Please wait...</p>");
+						// $.ajax({
+						// 	type: "GET",
+						// 	url: "AJAXFunctions.php",
+						// 	data: {
+						// 		no: "6", email: getCookie("userEmail")
+						// 	},
+						// 	success: function(response) {
+						// 		alert(response);
+						// 		if(response == "-1") {
+						// 			alert("1. Error in setting the Cookie ID. Please try again.");
+						// 		}
+						// 		else {
+						// 			setCookie("userID", response, 150);
+						// 		}
+						// 	},
+						// 	error: function(resp) {
+						// 		alert("here 1: ERROR in setting ID Cookie." + resp.responseText);
+						// 	}
+						// });
+
 					});
 
 		            }).error(function (data) {

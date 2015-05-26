@@ -55,8 +55,49 @@
 	else if(isset($_GET["no"]) && $_GET["no"] == "16") {     // to check the coupon code entered is correct or not.
 		CouponCode($_GET["couponCode"]);
 	}	
+	else if(isset($_GET["no"]) && $_GET["no"] == "17") {     // to check the coupon code and update the verification status of the user.
+		CouponCodeAndVerifyUser($_GET["couponCode"], $_GET["email"]);
+	}	
+	else if(isset($_GET["no"]) && $_GET["no"] == "18") {     // to check the user verification status. returns 1 on Verified user. 0 on  Not verified. -1 on error.
+		echo IsVerifiedUser($_GET["email"]);			
+	}	
 	else {
 		echo "Nothing to be returned by the AJAX call. No Parameter does not match any value.";
+	}
+
+	// this is the function to check the coupon code and then verify the user in the database.
+	// returns 1 if coupon is correct and user is verified. 0 if user is not verified. 2 if the coupon does not exist. 3 if an invalid coupon exists. -1 on error
+	function CouponCodeAndVerifyUser($couponCode, $email) {
+		$resp = "";
+		$couponResp = "";
+		$res = "";
+		try {
+			$couponResp = CheckCouponCode($couponCode);
+			if($couponResp == "1") {   // coupon is correct and it exists.
+				$resp = "1";
+				// verify the user email here
+				if(VerifyUser($email, "1") == "1") {
+					$res = "1";
+				}
+				else {
+					$res = "0";   // error condition of user not verified.
+				}
+			}
+			else if($couponResp == "2") {
+				$resp = "2";
+			}
+			else if($couponResp == "3") {
+				$resp = "3";
+			}
+			else {
+				$resp = "-1";
+			}
+			echo $res . " ~ " . $resp;
+		}
+		catch(Exception $e) {
+			$resp = "-1";
+			echo $resp;
+		}
 	}
 
 	// this is the function to check for the coupon code in the database.
@@ -257,7 +298,7 @@
 
 	//this is the function to return the id of the user based on the email address to javascript. (for varied functions.)
 	function SetCookieID($email) {
-		$res = "";
+		$res = "-1";
 		try {
 			$res = getUserID($email);
 			echo $res;

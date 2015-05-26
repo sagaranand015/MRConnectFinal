@@ -293,7 +293,8 @@
 
 			console.log(getCookie('userEmail'));
 
-			// here, first check if the user logged in is verified or not. If not, then show a blank page with an Error message.
+			// remove the h3 headings, in case they appear.
+			$('.allList').children('h3').remove();
 
 			alertMsg.children('p').remove();
 			alertMsg.append("<p>Building the MR - Network... Please wait</p>").fadeIn();
@@ -448,6 +449,16 @@
 
     	}   // end of populatePollArea.
 
+    	// this is the function to check the verification status of the user on logging into the home page. if the user is verified, go ahead. Otherwise, show an error message.
+    	// returns 0 on not verified. 1 on verified.
+    	// function CheckVerifiedUser() {
+
+    	// 	var isVerified = "0";
+
+    		
+    	// 	return isVerified;
+    	// }
+
     		$(document).ready(function() {
 
     			//for clearing the search bar
@@ -514,12 +525,65 @@
     				return false;
     			});
 
+    			//this is to get all the users from the database and show it in the list format.
+    			// 10 is the first time the page is getting loaded.
+    			// here, first check if the user logged in is verified or not. If not, then show a blank page with an Error message.
+    			// var isVerified = CheckVerifiedUser();
+    			// alert(isVerified);
+    	// 		alert(CheckVerifiedUser());
+    	// 		if(CheckVerifiedUser() == "1") {
+    	// 			populateUserData(10);     // for displaying the network, after user verification has been checked.
+    	// 		}
+    	// 		else if(CheckVerifiedUser() == "0") {
+    	// // 			popup.children('p').remove();
+					// // popup.append("<p>Oops! 2. Looks like your MR - Connect Account is not yet verified. Please go to the <a href='profile.php'>Profile Page</a> for Account Verification. Thank you.</p>").fadeIn();
+					// $('.allList').append("<h3>Oops! Looks like your MR - Connect Account is not yet verified. Please go to the <a href='profile.php'>Profile Page</a> for Account Verification. Thank you.</h3>");
+    	// 		}
+    	// 		else {
+    	// 			popup.children('p').remove();
+					// popup.append("<p>Oops! We encountered an error while checking for user authentication. Please try again.</p>").fadeIn();		
+    	// 		}
+
     			//to show the network tab on page load.
     			$('.ourNetwork').trigger('click');
 
-    			//this is to get all the users from the database and show it in the list format.
-    			// 10 is the first time the page is getting loaded.
-    			populateUserData(10);
+    			$('#alertMsg').children('p').remove();
+	    		$('#alertMsg').append("<p>Checking user Verification, Please wait for a moment...</p>").fadeIn();
+
+	    		$.ajax({
+	    			type: "GET",
+	    			url: "AJAXFunctions.php",
+	    			data: {
+	    				no: "18", email: getCookie("userEmail")
+	    			},
+	    			success: function(response)  {
+
+	    				$('#alertMsg').children('p').remove();
+						$('#alertMsg').fadeOut();
+
+	    				if(response == "1") {
+	    					//isVerified = "1";
+	    					populateUserData(10);
+	    				}
+	    				else if(response == "0") {
+	    					//isVerified = "0";
+	    					$('#popup').children('p').remove();
+	    					popup.append("<p>Oops! 2. Looks like your MR - Connect Account is not yet verified. Please go to the <a href='profile.php'>Profile Page</a> for Account Verification. Thank you.</p>").fadeIn();
+	    				}
+	    				else {
+	    					$('#popup').children('p').remove();
+							$('#popup').append("<p>Oops! We encountered an error while checking for user authentication. Please try again.</p>").fadeIn();		
+	    				}
+	    			},
+	    			error: function() {
+	    				$('#alertMsg').children('p').remove();
+						$('#alertMsg').fadeOut();
+						$('#popup').children('p').remove();
+						$('#popup').append("<p>Oops! We encountered an error while checking for user authentication. Please try again.</p>").fadeIn();	
+	    			}
+	    		});
+
+
 
     			//for the read more click link
     			$('.allList, .searchList').delegate('.readMoreLink', 'click', function() {
@@ -1084,6 +1148,8 @@
 			<div class="ourNetworkDiv divsMain" >
 
 				<div class="col-lg-9 col-md-9 allList">
+
+
 
 				</div>
 			</div>
