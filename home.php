@@ -1111,7 +1111,7 @@
 					We also Offer:
 				</p>
 				<a href="http://mentored-research.com" class="list-group-item MRMainPage">Equity Research Initiative</a>
-				<a href="http://mentored-research.com/theCompendium.php" class="list-group-item compendium">The Compendium</a>
+				<a href="http://mentored-research.com/Compendium" class="list-group-item compendium">The Compendium</a>
 			</div>
 
 			<!-- This is only for the tablets and the phone devices. -->
