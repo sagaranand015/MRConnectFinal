@@ -6,6 +6,133 @@
 	//these are for the PHP Helper files
 	include 'headers/databaseConn.php';
 
+	// this is the function to change the isVerified status of the user to 1 or 0, as passed.
+	// returns 1 on Success. -1 on error.
+	function VerifyUser($email, $status) {
+		global $connection;
+		$res = "-1";
+		try {
+			$query = "update Users set IsVerified='$status' where UserEmail='$email'";
+			$rs = mysql_query($query);
+			if(!$rs) {
+				$res = "-1";
+			}
+			else {
+				$res = "1";
+			}
+			return $res;
+		}
+		catch(Exception $e) {
+			$res = "-1";
+			return $res;
+		}
+	}
+
+	// this is the function to check for the verified user or not.
+	// returns 1 on Verified user. 0 on  Not verified. -1 on error.
+	function IsVerifiedUser($email) {
+		global $connection;
+		$resp = "-1";
+		try {
+			$query = "select * from Users where UserEmail='$email'";
+			$rs = mysql_query($query);
+			if(!$rs) {
+				$resp = "-1";
+			}
+			else {
+				while ($res = mysql_fetch_array($rs)) {
+					if($res["IsVerified"] == "1") {
+						$resp = "1";
+					}
+					else if($res["IsVerified"] == "0") {
+						$resp = "0";	
+					}
+					else {
+						$resp = "-1";		
+					}
+				}
+			}
+			return $resp;
+		}
+		catch(Exception $e) {
+			$resp = "-1";
+			return $resp;
+		}
+	}
+
+	// this is the function to check coupon validity!!
+	// returns 1 if the coupon is valid. 0 if invalid. -1 on error.
+	function IsCouponValid($code) {
+		global $connection;
+		$resp = "-1";
+		try {
+			$query = "select * from Coupons where CouponCode='$code'";
+			$rs = mysql_query($query);
+			if(!$rs) {
+				$resp = "-1";
+			}
+			else {
+				if(mysql_num_rows($rs) == 1) {
+					while ($res = mysql_fetch_array($rs)) {
+						if($res["IsValid"] == "1") {
+							$resp = "1";
+						}
+						else {
+							$resp = "0";
+						}
+					}
+				}   // end of if.
+				else {
+					$resp = "0";
+				}
+			}
+			return $resp;
+		}
+		catch(Exception $e) {
+			$resp = "-1";
+			return $resp;
+		}
+	}
+
+	// this is the function to check coupon existence and validity!
+	// returns 1 if the coupon exists and is valid. 2 if the coupon does not exist. 3 if an invalid coupon exists. -1 on error.
+	function CheckCouponCode($code) {
+		global $connection;
+		$resp = "-1";
+		try {
+
+			if(IsCouponValid($code) == "1") {
+				$query = "select * from Coupons where CouponCode='$code'";
+				$rs = mysql_query($query);
+				if(!$rs) {
+					$resp = "-1";
+				}
+				else {
+					if(mysql_num_rows($rs) == 0) {   // coupon does not exists.
+						$resp = "2";
+					}
+					else if(mysql_num_rows($rs) >= 1) { 
+						$resp = "1";   // coupon  exists and valid.
+					}
+					else {
+						$resp = "-1";
+					}
+				}
+			}
+			else if(IsCouponValid($code) == "0") {
+				$resp = "3";
+			}
+			else {
+				$resp = "-1";
+			}
+			return $resp;
+		}
+		catch(Exception $e) {
+			$resp = "-1";
+			return $resp;
+		}
+	}
+
 	// this is to submit the question to database based on category
 	function SubmitAskedQuestions($id, $email, $category, $question, $date) {
 		global $connection;
@@ -681,19 +808,24 @@
 	//this is to get the userID of the user whose Email is passed. -1 is returned on error!
 	function getUserID($email) {
 		global $connection;
+		$userID = "-1";
 		try {
 			$query = "select * from Users where UserEmail='$email'";
 			$rs = mysql_query($query);
 			if(!$rs) {
-				return "-1";
+				$userID = "-1";
+				return $userID;
 			}
 			else {
-				$res = mysql_fetch_array($rs);
-				return $res["UserID"];
+				while ($res = mysql_fetch_array($rs)) {
+					$userID = $res["UserID"];
+				}
 			}
+			return $userID;
 		}
 		catch(Exception $e) {
-			return "-1";
+			$userID = "-1";
+			return $userID;
 		}
 	}
 
@@ -702,7 +834,7 @@
 		global $connection;
 		try {
 			//$date = date("Y-m-d H:i:s");
-			$query = "insert into Users(UserEmail, UserName, UserPic, UserContact, UserProfile, UserLocation, UserTwitter, UserLastAss, UserType, UpdatedOn) values('$email', '$name', '$pic', '$contact', '$profile', '$location', '$twitter', '$lastAss', '$type', '$updatedOn')";
+			$query = "insert into Users(UserEmail, UserName, UserPic, UserContact, UserProfile, UserLocation, UserTwitter, UserLastAss, UserType, UpdatedOn, IsVerified) values('$email', '$name', '$pic', '$contact', '$profile', '$location', '$twitter', '$lastAss', '$type', '$updatedOn', '1')";
 			$rs = mysql_query($query);
 			if(!$rs) {
 				return "-1";

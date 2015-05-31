@@ -1,8 +1,5 @@
 <?php
 
-	//these are for the PHP Helper files
-	//include('headers/databaseConn.php');
-	//include('headers/AJAXFunctions.php');
 	include('helpers.php');
 ?>
 
@@ -209,21 +206,25 @@
 									},
 									success: function(response) {
 										if(response == "-1") {
-											alert("Error. Please try again.");
+											alert("2. Error in setting the Cookie ID. Please try again.");
 										}
 										else {
 											setCookie("userID", response, 150);
+
+											window.location.href = "home.php?exist=1";	
 										}
 									},
-									error: function(response) {
-										//alert("ERROR in setting ID Cookie." + response.responseText);
+									error: function(resp) {
+										alert("Here 2. ERROR in setting ID Cookie." + resp.responseText);
 									}
 								});
 
 								// to go the network page bcoz the data already exists in the database.
-								window.location.href = "home.php?exist=1";	
 							}
-							else if(response == "-1") {
+							else if(response == "-1") {   // user does not exists! So, the -1.
+
+								// here, show the coupon code Modal box. And make another function to handle the coupon code thing.
+
 								window.location.href = "profile.php?exist=-1";		
 							}
 							else {
@@ -239,7 +240,6 @@
 					//No cookies exist. Load data from database if record exists. Otherwise from linkedin.
 					console.log("Cookies DOES NOT exist. " + getCookie("userEmail"));
 					IN.User.authorize(linkedInAuth);
-
 				}
 				else {
 					alert("Problem with the cookies and stuff!!");
@@ -258,6 +258,8 @@
                 	var memData = data.values[0];
 					var email = memData.emailAddress;
 					console.log(email);
+
+					// cookie is being set from the email address that comes from linkedin.
 					setCookie("userEmail", email, 150);
 
 					alertMsg.children('p').remove();
@@ -299,7 +301,7 @@
 							alertMsg.fadeOut('fast');
 							if(response == "1") {
 
-								// here, set the ID Cookie for all future correspondences!
+								// // here, set the ID Cookie for all future correspondences!
 								$.ajax({
 									type: "GET",
 									url: "AJAXFunctions.php",
@@ -308,24 +310,28 @@
 									},
 									success: function(response) {
 										if(response == "-1") {
-											alert("Error in setting the Cookie ID. Please try again.");
+											alert("1. Error in setting the Cookie ID. Please try again.");
 										}
 										else {
 											setCookie("userID", response, 150);
+
+											window.location.href = "home.php?exist=1";
 										}
 									},
-									error: function(response) {
-										alert("ERROR in setting ID Cookie." + response.responseText);
+									error: function(resp) {
+										alert("here 1: ERROR in setting ID Cookie." + resp.responseText);
 									}
 								});
 
-								// now, redirect to the profile page coz data is there in the database.
+								// now, redirect to the home page coz data is there in the database.
 								//window.location.href = "profile.php?exist=1";	
-								window.location.href = "home.php?exist=1";
+								//window.location.href = "home.php?exist=1";
 							}
 							else if(response == "-1") {
-
 								// redirect to the profile page. Data is not there in the database.
+
+								// show the coupon modal here and then authenticate.
+								
 								window.location.href = "profile.php?exist=-1";		
 							}
 							else {
@@ -335,6 +341,31 @@
 						error: function(response) {
 							alert("Error. " + response.responseText);
 						}
+					}).done(function() {
+
+						// here, set the ID Cookie for all future correspondences!
+						// alertMsg.children('p').remove();
+						// alertMsg.append("<p>SEtting the ID Cookie. Please wait...</p>");
+						// $.ajax({
+						// 	type: "GET",
+						// 	url: "AJAXFunctions.php",
+						// 	data: {
+						// 		no: "6", email: getCookie("userEmail")
+						// 	},
+						// 	success: function(response) {
+						// 		alert(response);
+						// 		if(response == "-1") {
+						// 			alert("1. Error in setting the Cookie ID. Please try again.");
+						// 		}
+						// 		else {
+						// 			setCookie("userID", response, 150);
+						// 		}
+						// 	},
+						// 	error: function(resp) {
+						// 		alert("here 1: ERROR in setting ID Cookie." + resp.responseText);
+						// 	}
+						// });
+
 					});
 
 		            }).error(function (data) {
