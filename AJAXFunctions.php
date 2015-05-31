@@ -584,31 +584,33 @@
 					}
 
 					//now,save all the education details here.
-					foreach ($eduJson as $eduItem) {
-						if(!isset($eduItem["degree"])) {
-							$eduItem["degree"] = "";
-						}
-						if(!isset($eduItem["startDate"]["year"])) {
-							$eduItem["startDate"]["year"] = "";
-						}
-						if(!isset($eduItem["endDate"]["year"])) {
-							$eduItem["endDate"]["year"] = "";
-						}
-						if(!isset($eduItem["fieldOfStudy"])) {
-							$eduItem["fieldOfStudy"] = "";
-						}
-						if(!isset($eduItem["schoolName"])) {
-							$eduItem["schoolName"] = "";
-						}
-						$eduDate = $eduItem["startDate"]["year"] . "-" . $eduItem["endDate"]["year"];
+					if(isset($eduJson)) {
+						foreach ($eduJson as $eduItem) {
+							if(!isset($eduItem["degree"])) {
+								$eduItem["degree"] = "";
+							}
+							if(!isset($eduItem["startDate"]["year"])) {
+								$eduItem["startDate"]["year"] = "";
+							}
+							if(!isset($eduItem["endDate"]["year"])) {
+								$eduItem["endDate"]["year"] = "";
+							}
+							if(!isset($eduItem["fieldOfStudy"])) {
+								$eduItem["fieldOfStudy"] = "";
+							}
+							if(!isset($eduItem["schoolName"])) {
+								$eduItem["schoolName"] = "";
+							}
+							$eduDate = $eduItem["startDate"]["year"] . "-" . $eduItem["endDate"]["year"];
 
-						if(saveEducation($userID, $eduItem["schoolName"], $eduDate, $eduItem["degree"], $eduItem["fieldOfStudy"], $date) == "1") {
-							$res = "1";
-						}
-						else {
-							$res = "-1";
-						}
-					}   //end of foreach loop for education.
+							if(saveEducation($userID, $eduItem["schoolName"], $eduDate, $eduItem["degree"], $eduItem["fieldOfStudy"], $date) == "1") {
+								$res = "1";
+							}
+							else {
+								$res = "-1";
+							}
+						}   //end of foreach loop for education.
+					}
 
 					//now, save the Experience listings to the database.
 					foreach ($expJson as $expItem) {

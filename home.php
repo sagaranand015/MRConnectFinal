@@ -605,113 +605,123 @@
     					success: function(response) {
     						//$('.detailsModalBody').append(response);
 
-    						var pers = response.split(" @bk ")[0];
-	        				var educ = response.split(" @bk ")[1];
-	        				var expr = response.split(" @bk ")[2];
-	        				var intr = response.split(" @bk ")[3];
-
-	        				if(pers == undefined || pers == "-4") {
-	        					var markup = "";
-		        				$('.personal').children('table,h2,b').remove();
-		        				markup += "<h2>Personal Details</h2><b>No Relevant Data found.</b>";
-		        				$('.personal').append(markup);
-		        			}
-		        			else {
-		        				//for the personal contact thing of the user
-		        				var perDetails = pers.split(" ,& ");
-
-		        				$('.detailsModalTitle').html(perDetails[1] + " - Details");
-
-		        				var markup = "";
-		        				$('.personal').children('table,h2,b').remove();
-		        				// <tr><td>Twitter Handle: </td><td>" + perDetails[6] + "</td></tr><tr><td>Last Association in: </td><td>" + perDetails[7] + "</td></tr><tr><td>Attended ERI as: </td><td>" + perDetails[8] + "</td></tr>
-
-		        				//for the last association thing:
-		        				var last = "";
-		        				if(perDetails[9] == "1")
-		        					last = "ERI Alumnus";
-		        				else if(perDetails[9] == "2")
-		        					last = "BSE Alumnus";
-		        				else if(perDetails[9] == "3")
-		        					last = "Technical Analysis Alumnus";
-		        				else if(perDetails[9] == "4")
-		        					last = "Other";
-		        				else
-		        					last = "Not Defined";
-
-		        				markup += "<h2>Personal Details</h2><table class='table perTable'><tr><td class='tableLabel'>Name: </td><td class='tableContent'>" + perDetails[1] + "</td></tr><tr><td class='tableLabel'>Location: </td><td class='tableContent'>" + perDetails[5] + "</td></tr><tr><td class='tableLabel'>LinkedIn Profile: </td><td class='tableContent'>" + perDetails[4] + "</td></tr><tr><td class='tableLabel'>Last Associated with M-R: </td><td class='tableContent'>" + last + "</td></tr></table>";
-		        				$('.personal').append(markup);
-		        			}
-
-
-		        			if(educ == undefined || educ == "-4") {
-		        				var eduMarkup = "";
-		                    	$('.educationListings').children('table,h2,b').remove();
-		                    	eduMarkup += "<h2>Education Listings</h2><b>No Relevant Data found.</b>";
-		                    	$('.educationListings').append(eduMarkup);
-		        			}
-		        			else {
-		        				var e = educ.split(" @E ");
-			                    //for removing the tables!
-			                    var eduMarkup = "";
-		                    	$('.educationListings').children('table,h2,b').remove();
-		                    	eduMarkup += "<h2>Education Listings</h2>";
-			                    for(var i = 0;i<=e.length-4;i+=4) {
-									eduMarkup += "<table class='table'><tr><td class='tableLabel'>School Name: </td><td class='tableContent'>" + e[i] + "</td></tr><tr><td class='tableLabel'>Dates Attended: </td><td class='tableContent'>" + e[i+1] + "</td></tr><tr><td class='tableLabel'>Degree: </td><td class='tableContent'>" + e[i+2] + "</td></tr><tr><td class='tableLabel'>Field of Study: </td><td class='tableContent'>" + e[i+3] + "</td></tr></table>";
-			                    }
-			                    $('.educationListings').append(eduMarkup);
-		        			}
-
-
-		        			if(expr == undefined || expr == "-4") {
-		        				$('.experienceListings').children('table,h2,b').remove();
-		        				var expMarkup = "";
-			                    $('.experienceListings').children('table,h2,b').remove();
-			                    expMarkup += "<h2>Experience Listings</h2><b>No Relevant Data found.</b>";
-			                    $('.experienceListings').append(expMarkup);
-		        			}
-		        			else {
-		        				//for populating the Experience Fields
-			                    var ex = expr.split(" @Ex ");
-			                    var expMarkup = "";
-			                    $('.experienceListings').children('table,h2,b').remove();
-			                    expMarkup += "<h2>Experience Listings</h2>";
-			                    for(var i = 0;i<=ex.length-4;i+=4) {
-			                    	expMarkup += "<table class='table'><tr><td class='tableLabel'>Company Name: </td><td class='tableContent'>" + ex[i] + "</td></tr><tr><td class='tableLabel'>Dates Attended: </td><td class='tableContent'>" + ex[i+1] + "</td></tr><tr><td class='tableLabel'>Title: </td><td class='tableContent'>" + ex[i+2] + "</td></tr><tr><td class='tableLabel'>Summary: </td><td class='tableContent'>" + ex[i+3] + "</td></tr></table>";
-			                    }
-			                    $('.experienceListings').append(expMarkup);
-		        			}
-
-
-		        			if(intr == undefined || intr == "-5") {
-		        				var intMarkup = "";
-
-			                    $('.interestListings').children('div,h2,b').remove();
-			                    intMarkup += "<h2>Areas of Expertise</h2><b>No Relevant Data found.</b>";
-			                    $('.interestListings').append(intMarkup);
-		        			}
-		        			else {
-		        				//this is for the interest listings.
-			                    var interests = intr.split(" @I ");
-			                    var intMarkup = "";
-
-			                    $('.interestListings').children('div,h2,b').remove();
-			                    intMarkup += "<h2>Areas of Expertise</h2>";
-			                    intMarkup += "<div class='list-group'>";
-			                    for(var i = 0;i<interests.length;i++) {
-			                    	if(interests[i] == "" || interests[i] == " " || interests[i] == "-" || interests[i] == " ~ " || interests[i] == "-5") {
-
-			                    	}
-			                    	else {
-			                    		intMarkup += "<a class='list-group-item active' style='margin: 1% 0 0 0%;'><h4>" + interests[i] + "</h4></a>";
-			                    	}
-			                    }
-			                    intMarkup += "</div>";
-			                    $('.interestListings').append(intMarkup);
-		        			}
-
-		                    alertMsg.children('p').remove();
+    						alertMsg.children('p').remove();
 		                    alertMsg.fadeOut();
+
+    						if(response == "-5") {
+    							$('#popup').children('p').remove();
+    							$('#popup').append("<p>The user you requested is has not yet been Verified by the MR-Connect Team. Please wait for a while before this user's information can be displayed. Thank You.</p>").fadeIn();
+    						}
+    						else {
+
+    							var pers = response.split(" @bk ")[0];
+		        				var educ = response.split(" @bk ")[1];
+		        				var expr = response.split(" @bk ")[2];
+		        				var intr = response.split(" @bk ")[3];
+
+		        				console.log(pers + " --> " + educ + " --> " + expr + " --> " + intr);
+
+		        				if(pers == undefined || pers == "-4") {
+		        					var markup = "";
+			        				$('.personal').children('table,h2,b').remove();
+			        				markup += "<h2>Personal Details</h2><b>No Relevant Data found.</b>";
+			        				$('.personal').append(markup);
+			        			}
+			        			else {
+			        				//for the personal contact thing of the user
+			        				var perDetails = pers.split(" ,& ");
+
+			        				$('.detailsModalTitle').html(perDetails[1] + " - Details");
+
+			        				var markup = "";
+			        				$('.personal').children('table,h2,b').remove();
+			        				// <tr><td>Twitter Handle: </td><td>" + perDetails[6] + "</td></tr><tr><td>Last Association in: </td><td>" + perDetails[7] + "</td></tr><tr><td>Attended ERI as: </td><td>" + perDetails[8] + "</td></tr>
+
+			        				//for the last association thing:
+			        				var last = "";
+			        				if(perDetails[9] == "1")
+			        					last = "ERI Alumnus";
+			        				else if(perDetails[9] == "2")
+			        					last = "BSE Alumnus";
+			        				else if(perDetails[9] == "3")
+			        					last = "Technical Analysis Alumnus";
+			        				else if(perDetails[9] == "4")
+			        					last = "Other";
+			        				else
+			        					last = "Not Defined";
+
+			        				markup += "<h2>Personal Details</h2><table class='table perTable'><tr><td class='tableLabel'>Name: </td><td class='tableContent'>" + perDetails[1] + "</td></tr><tr><td class='tableLabel'>Location: </td><td class='tableContent'>" + perDetails[5] + "</td></tr><tr><td class='tableLabel'>LinkedIn Profile: </td><td class='tableContent'>" + perDetails[4] + "</td></tr><tr><td class='tableLabel'>Last Associated with M-R: </td><td class='tableContent'>" + last + "</td></tr></table>";
+			        				$('.personal').append(markup);
+			        			}
+
+
+			        			if(educ == undefined || educ == "-4") {
+			        				var eduMarkup = "";
+			                    	$('.educationListings').children('table,h2,b').remove();
+			                    	eduMarkup += "<h2>Education Listings</h2><b>No Relevant Data found.</b>";
+			                    	$('.educationListings').append(eduMarkup);
+			        			}
+			        			else {
+			        				var e = educ.split(" @E ");
+				                    //for removing the tables!
+				                    var eduMarkup = "";
+			                    	$('.educationListings').children('table,h2,b').remove();
+			                    	eduMarkup += "<h2>Education Listings</h2>";
+				                    for(var i = 0;i<=e.length-4;i+=4) {
+										eduMarkup += "<table class='table'><tr><td class='tableLabel'>School Name: </td><td class='tableContent'>" + e[i] + "</td></tr><tr><td class='tableLabel'>Dates Attended: </td><td class='tableContent'>" + e[i+1] + "</td></tr><tr><td class='tableLabel'>Degree: </td><td class='tableContent'>" + e[i+2] + "</td></tr><tr><td class='tableLabel'>Field of Study: </td><td class='tableContent'>" + e[i+3] + "</td></tr></table>";
+				                    }
+				                    $('.educationListings').append(eduMarkup);
+			        			}
+
+
+			        			if(expr == undefined || expr == "-4") {
+			        				$('.experienceListings').children('table,h2,b').remove();
+			        				var expMarkup = "";
+				                    $('.experienceListings').children('table,h2,b').remove();
+				                    expMarkup += "<h2>Experience Listings</h2><b>No Relevant Data found.</b>";
+				                    $('.experienceListings').append(expMarkup);
+			        			}
+			        			else {
+			        				//for populating the Experience Fields
+				                    var ex = expr.split(" @Ex ");
+				                    var expMarkup = "";
+				                    $('.experienceListings').children('table,h2,b').remove();
+				                    expMarkup += "<h2>Experience Listings</h2>";
+				                    for(var i = 0;i<=ex.length-4;i+=4) {
+				                    	expMarkup += "<table class='table'><tr><td class='tableLabel'>Company Name: </td><td class='tableContent'>" + ex[i] + "</td></tr><tr><td class='tableLabel'>Dates Attended: </td><td class='tableContent'>" + ex[i+1] + "</td></tr><tr><td class='tableLabel'>Title: </td><td class='tableContent'>" + ex[i+2] + "</td></tr><tr><td class='tableLabel'>Summary: </td><td class='tableContent'>" + ex[i+3] + "</td></tr></table>";
+				                    }
+				                    $('.experienceListings').append(expMarkup);
+			        			}
+
+
+			        			if(intr == undefined || intr == "-5") {
+			        				var intMarkup = "";
+
+				                    $('.interestListings').children('div,h2,b').remove();
+				                    intMarkup += "<h2>Areas of Expertise</h2><b>No Relevant Data found.</b>";
+				                    $('.interestListings').append(intMarkup);
+			        			}
+			        			else {
+			        				//this is for the interest listings.
+				                    var interests = intr.split(" @I ");
+				                    var intMarkup = "";
+
+				                    $('.interestListings').children('div,h2,b').remove();
+				                    intMarkup += "<h2>Areas of Expertise</h2>";
+				                    intMarkup += "<div class='list-group'>";
+				                    for(var i = 0;i<interests.length;i++) {
+				                    	if(interests[i] == "" || interests[i] == " " || interests[i] == "-" || interests[i] == " ~ " || interests[i] == "-5") {
+
+				                    	}
+				                    	else {
+				                    		intMarkup += "<a class='list-group-item active' style='margin: 1% 0 0 0%;'><h4>" + interests[i] + "</h4></a>";
+				                    	}
+				                    }
+				                    intMarkup += "</div>";
+				                    $('.interestListings').append(intMarkup);
+			        			}
+
+    						}   // end of else.
     					},
     					error: function() {
     						alert("Error in ajax.");
