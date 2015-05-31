@@ -6,6 +6,47 @@
 	//these are for the PHP Helper files
 	include 'headers/databaseConn.php';
 
+	//this is the function to send the mail to the admin for the user who requested an invite for MR - Connect
+	// Returns 1 on Success and -1 on Failure.
+	function InviteRequestAdminMail($to, $forName, $forEmail, $forTel, $forDate) {
+		$res = "-1";
+		$mailBody = "";
+		try{
+
+			$subject = "MR - Connect Invitation Request Received";
+
+			$headers = "MIME-Version: 1.0" . "\r\n";
+			$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+			$headers .= "From: guide@mentored-research.com" . "\r\n";
+
+			// write the mail body here.
+			$mailBody .= "<h1>MR - Connect Invitation Request Received</h1><br />";
+			$mailBody .= "Dear Admin, " . "<br />";
+			$mailBody .= "Following are the details of the user who has requested a MR - Connect Invite: <br /><br />";
+
+			$mailBody .= "<b>" . $forName . "</b><br />";
+			$mailBody .= "<b>" . $forEmail . "</b><br />";
+			$mailBody .= "<b>" . $forTel . "</b><br />";
+			$mailBody .= "Request on: " . $forDate . "<br />";
+
+			$mailBody .= "<br /><br />Thank You.";
+			$mailBody .= "<br />MR - Connect";
+			$mailBody .= "<br /><a href='http://mentored-research.com'>Mentored-Research</a>";
+
+			if(mail($to, $subject, $mailBody, $headers) == true) {
+				$res = "1";
+			}
+			else {
+				$res = "-1";	
+			}
+			return $res;
+		}	
+		catch(Exception $e) {
+			$res = "-1";
+			return $res;
+		}
+	}
+
 	// this is the function to change the isVerified status of the user to 1 or 0, as passed.
 	// returns 1 on Success. -1 on error.
 	function VerifyUser($email, $status) {

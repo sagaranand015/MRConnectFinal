@@ -23,7 +23,7 @@
 		<meta name="Mentored-Research Connect" content="MR Connect, Mentored-Research">
 		<meta name="author" content="Sagar anand, Mentored-Research Tech Team, MR Connect">
 
-		<title>MR-Connect Profile Page</title>
+		<title>MR-Connect Profile</title>
 
 		<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
 		<link rel="icon" href="img/favicon.ico" type="image/x-icon" />
@@ -1230,6 +1230,68 @@
 					return false;
 				});
 
+				// for the Request invite button.
+				$('#btnRequestInvite, #btnRequestInviteUpdate').on('click', function() {
+
+					$('.modal').modal('hide');
+					$('.inviteModal').modal('show');
+
+					return false;
+				});
+
+				$('#btnInvite').on('click', function() {
+
+					var name = $('#txtName').val();
+					var email = $('#txtEmail').val();
+					var tel = $('#txtTel').val();
+
+					if(name == "" || email == "" || tel == "") {
+						popup.children('p').remove();							
+						popup.append("<p>Oops! Looks like you did not fill all the Required Fields. Please try again.</p>").fadeIn();							
+					}
+					else if(!isValidEmailAddress(email)) {
+						popup.children('p').remove();							
+						popup.append("<p>Oops! Looks like you did not fill the Email Address correctly. Please try again.</p>").fadeIn();								
+					}
+					else {
+						alertMsg.children("p").remove();
+						alertMsg.append("<p>Please wait while we register your Request for MR - Connect Invite...</p>").fadeIn();
+						$.ajax({
+							type: "GET",
+							url: "AJAXFunctions.php",
+							data: {
+								no: "19", email: email, name: name, tel: tel
+							},
+							success: function(response) {
+								alertMsg.children('p').remove();
+								alertMsg.fadeOut();
+
+								if(response == "1") {
+									popup.children('p').remove();							
+									popup.append("<p>Your Request has been forwarded to the MR - Connect Team and We'll contact you in 48 hours. Thank You.</p>").fadeIn();	
+								}
+								else if(response == "0") {
+									popup.children('p').remove();							
+									popup.append("<p>Your Request has been forwarded to the MR - Connect Team and We'll contact you in 48 hours. Thank You.</p>").fadeIn();	
+								}
+								else {
+									popup.children('p').remove();							
+									popup.append("<p>Oops! We encountered an error while processing your Request for an invite. Please try again.</p>").fadeIn();								
+								}
+							},
+							error: function() {
+								alertMsg.children('p').remove();
+								alertMsg.fadeOut();
+								popup.children('p').remove();							
+								popup.append("<p>Oops! We encountered an error while processing your Request for an invite. Please try again.</p>").fadeIn();
+							}
+						});   // end of ajax.
+
+					}   // end of else
+
+					return false;
+				});
+
 			});   // end of document ready.
 		</script>
 
@@ -1753,6 +1815,66 @@
             			</td>
             		</tr>
                 </table>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		      </div>
+		    </div><!-- /.modal-content -->
+		  </div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+
+				<!-- this is for the coupon modal that appears for the user activation -->
+		<div class="modal fade inviteModal">
+		  <div class="modal-dialog">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h4 class="modal-title inviteModalTitle">
+		        	Request Invite for MR - Connect
+		        </h4>
+		      </div>
+		      <div class="modal-body inviteModalBody">
+		      	<table class="table">
+		        	<tr>
+		        		<td>
+		        			<p style="text-align: left; font-family: writingText; font-size: 1.2em;">
+								<b>Hey there!</b>
+							</p>
+
+							<p style="text-align: left; font-family: writingText; font-size: 1.2em;">
+								Please fill in the following details for Requesting an invite for MR - Connect. We'd get back to you as soon as possible with your Invite Code in your provided mailbox.
+							</p>
+
+							<p style="text-align: left; font-family: writingText; font-size: 1.2em;">
+								Thank You.
+							</p>
+		        		</td>
+		        	</tr>
+            		<tr>
+            			<td>
+            				<input type="text" id="txtName" placeholder="Enter Name*" class="form-control" />
+            			</td>
+            		</tr>
+            		<tr>
+            			<td>
+            				<input type="text" id="txtEmail" placeholder="Enter Email*" class="form-control" />
+            			</td>
+            		</tr>
+            		<tr>
+            			<td>
+            				<input type="text" id="txtTel" placeholder="Enter Telephone Number*" class="form-control" />
+            			</td>
+            		</tr>
+            		<tr>
+            			<td>
+            				<button class="btn btn-lg btn-block btn-primary btnInvite" id="btnInvite" style="font-family: boldText;">
+            					Invite Me In!
+            				</button>
+            			</td>
+            		</tr>
+                </table>
+
+
 		      </div>
 		      <div class="modal-footer">
 		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

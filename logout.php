@@ -9,7 +9,7 @@
 		<meta name="Mentored-Research Connect" content="MR Connect, Mentored-Research">
 		<meta name="author" content="Sagar anand, Mentored-Research Tech Team, MR Connect">
 
-		<title>MR-Connect - Logout</title>
+		<title>MR-Connect Logout</title>
 
 		<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
 		<link rel="icon" href="img/favicon.ico" type="image/x-icon" />

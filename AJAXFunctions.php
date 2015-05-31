@@ -61,8 +61,40 @@
 	else if(isset($_GET["no"]) && $_GET["no"] == "18") {     // to check the user verification status. returns 1 on Verified user. 0 on  Not verified. -1 on error.
 		echo IsVerifiedUser($_GET["email"]);			
 	}	
+	else if(isset($_GET["no"]) && $_GET["no"] == "19") {     // for requesting an invite for MR - Connect
+		RequestInvite($_GET["email"], $_GET["name"], $_GET["tel"]);	
+	}	
 	else {
 		echo "Nothing to be returned by the AJAX call. No Parameter does not match any value.";
+	}
+
+	// this is the function for requesting an invite for MR - Connect.
+	// Returns 1 on insertion and mail sent. 0 on insertion success and mail fail. -1 on Error in insertion.
+	function RequestInvite($email, $name, $tel) {
+		$resp = "-1";
+		$date = date("Y-m-d H:i:s");
+		$mailRes = "-1";
+		try {
+			$query = "insert into InviteRequests(UserEmail, UserName, UserTel, UpdatedOn) values('$email', '$name', '$tel', '$date')";
+			$rs = mysql_query($query);
+			if(!$rs) {
+				$resp = "-1";
+			}
+			else {   // insertion is successful here.
+				$mailRes = InviteRequestAdminMail("info@mentored-research.com", $email, $name, $tel, $date);
+				if($mailRes == "1") {
+					$resp = "1";
+				}
+				else if($mailRes == "-1") {
+					$resp = "0";
+				}
+			}
+			echo $resp;
+		}
+		catch(Exception $e) {
+			$resp = "-1";
+			echo $resp;
+		}
 	}
 
 	// this is the function to check the coupon code and then verify the user in the database.
