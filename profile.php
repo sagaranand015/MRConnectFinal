@@ -295,10 +295,16 @@
         		}
         		else if(qs["exist"] == "-1") {
 
+        			// $('#popup').children('p').remove();
+        			// $('#popup').append("<p>Please wait for a moment while we verify your account and save your data to our servers. This might take a minute or two, Please be patient...</p>").fadeIn();
+
         			// do all the coupon related stuff here. If the coupon code is correct, go to linkedIn authentication and save the user in the database.
         			// if incorrect, keep the modal box open and keep asking for the coupon code.
         			$('.couponModal').modal('show');
         			// NOTE: if linkedIn authentication is reached, go ahead and mark the user as activated in the database.
+
+        			$('#popup').children('p').remove();
+        			$('#popup').fadeOut();
 
         			//IN.User.authorize(linkedInAuth);	
         		}
@@ -686,17 +692,29 @@
 	                    	}
 	                    });   // end of the AJAX call saving user data to the database.
 
-	                    $('#headName').text(memData.firstName + "  " + memData.lastName);
-	                    $('.displayImg').attr('src', memData.pictureUrls.values[0]);  
+						if(memData.firstName == undefined) {
+						}
+						else {
+							$('#headName').text(memData.firstName + "  " + memData.lastName);
+							$('.name').children('span').html(memData.firstName + " " + memData.lastName);
+	                    	$('.name').attr('data-content', memData.firstName + " " + memData.lastName);	
+						}
 
-	                    $('.name').children('span').html(memData.firstName + " " + memData.lastName);
-	                    $('.name').attr('data-content', memData.firstName + " " + memData.lastName);
+						if(memData.pictureUrls == undefined || memData.pictureUrls.values == undefined) {
+						}
+						else {
+							$('.displayImg').attr('src', memData.pictureUrls.values[0]);  
+						}
 
-	                    $('.email').children('span').html(memData.emailAddress);
-	                    $('.email').attr('data-content', memData.emailAddress);
+						if(memData.emailAddress == undefined) {
+						}
+						else {
+							$('.email').children('span').html(memData.emailAddress);
+	                    	$('.email').attr('data-content', memData.emailAddress);
+						}
 
-	                    $('.contact').children('span').html(phno);
-                    	$('.contact').attr('data-content', phno);
+	                    // $('.contact').children('span').html(phno);
+                    	// $('.contact').attr('data-content', phno);
 
                     	var ph = "";
                     	if(memData.phoneNumbers == undefined || memData.phoneNumbers.values == undefined) {
@@ -912,6 +930,12 @@
 					popup.fadeOut();
 					return false;
 				});
+
+				var qs = getQueryStrings();
+        		if(qs["exist"] == "-1") {
+        			popup.children('p').remove();
+					popup.append("<p>Please wait while we collect your Profile data and Check for Account Verification. This might take a minute or two, please be patient...</p>").fadeIn();
+        		}
 
 				//for the scrolling thing!
 				$('.scrolly').scrolly();
@@ -1227,7 +1251,7 @@
 		</div>
 
 		<div id="popup" class="alert alert-danger" role="alert">
-			  <button id="btnExitPopup" type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			<button id="btnExitPopup" type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 		</div>
 
 		<!--  this is for the main first div -->
