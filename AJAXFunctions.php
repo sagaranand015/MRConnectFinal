@@ -351,6 +351,9 @@
 		$res = "";
 		$date = date("Y-m-d H:i:s");		
 		try {
+
+			$id = getUserID($email);
+
 			if(getInterests($email, $id) == "" || getInterests($email, $id) == "-3") {
 				// insert here. User record does not exists in the database.
 				if(InsertInterests($id, $email, $i1, $i2, $i3, $i4, $i5, $i6, $i7, $date) == "1") {

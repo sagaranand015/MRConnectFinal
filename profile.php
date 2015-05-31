@@ -1049,7 +1049,7 @@
 								if(response == "1") {
 									alertMsg.children('p').remove();
 									alertMsg.fadeOut();
-									popup.append("<p>And We're done.</p>").fadeIn();
+									popup.append("<p>And We have updated/added your interests. Thank You.</p>").fadeIn();
 								}
 								else {
 									alertMsg.children('p').remove();
