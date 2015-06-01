@@ -6,6 +6,98 @@
 	//these are for the PHP Helper files
 	include 'headers/databaseConn.php';
 
+	// // this is the function to get the name of the user from the email address of the user.
+	// // Returns -1 on Error. Else, returns the name of the user.
+	// function GetUserName($email, $id) {
+	// 	global $connection;
+	// 	$resp = "-1";
+	// 	try {
+	// 		$query = "select * from Users where UserEmail='$email'";
+	// 		$rs = mysql_query($query);
+	// 		if(!$rs) {
+	// 			$resp = "-1";
+	// 		}
+	// 		else {
+	// 			while ($res = mysql_fetch_array($rs)) {
+	// 				$resp = $res["UserName"];
+	// 			}
+	// 		}
+	// 		return $resp;
+	// 	}	
+	// 	catch(Exception $e)  {
+	// 		$resp = "-1";
+	// 		return $resp;
+	// 	}
+	// }
+
+	// this is the function to get the name of the Category based on the id of the category passed.
+	// Returns "" if id is incorrect.
+	function GetCategoryName($id) {
+		$res = "";
+		try {
+			if($id == "1") {
+				$res = "G.M.A.T.";
+			}
+			else if($id == "2") {
+				$res = "C.A.T./X.A.T.";
+			}
+			else if($id == "3") {
+				$res = "F.R.M.";
+			}
+			else {
+				$res = "";
+			}
+			return $res;
+		}
+		catch(Exception $e) {
+			$res = "";
+			return $res;
+		}
+	}
+
+	//this is the function to send the mail to the admin for the user who submitted a question in AskQuestions
+	// Returns 1 on Success and -1 on Failure.
+	function AskQuestionAdminMail($to, $userEmail, $category, $question, $date) {
+		$res = "-1";
+		$mailBody = "";
+		try{
+
+			$subject = "MR - Connect Question Asked";
+
+			$headers = "MIME-Version: 1.0" . "\r\n";
+			$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+			$headers .= "From: guide@mentored-research.com" . "\r\n";
+
+			// write the mail body here.
+			$mailBody .= "<h1>MR - Connect Question Asked</h1><br />";
+			$mailBody .= "Dear Admin, " . "<br />";
+			$mailBody .= "Following are the details of the question asked on MR-Connect Home: <br /><br />";
+
+			$mailBody .= "Name: <b>" . GetUserName($userEmail) . "</b><br />";
+			$mailBody .= "Email Address: <b>" . $userEmail . "</b><br />";
+			$mailBody .= "Question Category: <b>" . GetCategoryName($category) . "</b><br />";
+			$mailBody .= "Question Asked: <b>" . $question . "</b><br />";
+			$mailBody .= "Request on<b>: " . $date . "</b><br />";
+
+			$mailBody .= "<br /><br />Thank You.";
+			$mailBody .= "<br />MR - Connect";
+			$mailBody .= "<br /><a href='http://mentored-research.com'>Mentored-Research</a>";
+
+			if(mail($to, $subject, $mailBody, $headers) == true) {
+				$res = "1";
+			}
+			else {
+				$res = "-1";	
+			}
+			return $res;
+		}	
+		catch(Exception $e) {
+			$res = "-1";
+			return $res;
+		}
+	}
+
+
 	//this is the function to send the mail to the admin for the user who requested an invite for MR - Connect
 	// Returns 1 on Success and -1 on Failure.
 	function InviteRequestAdminMail($to, $forName, $forEmail, $forTel, $forDate) {
@@ -185,7 +277,12 @@
 				$response = "-1";
 			}
 			else {
-				$response = "1";
+				if(AskQuestionAdminMail("info@mentored-research.com", $email, $category, $question, $date) == "1") {
+					$response = "1";
+				}	
+				else {    // even if the mail sending fails, return the response as 1 coz its added to the database atleast.
+					$response = "1";
+				}
 			}
 			return $response;
 		}
