@@ -588,8 +588,10 @@
 		        			populateData(response);
 	        			}
 	        		},
-	        		error: function(response) {
-	        			alert("Error in getting the data from the database. " + response.responseText);
+	        		error: function() {
+	        			//alert("Error in getting the data from the database. " + response.responseText);
+	        			//window.location.href = ""
+	        			location.reload();
 	        		}
 	        	});
 	        }    //end of onlyAuthenticate function
